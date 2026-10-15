@@ -1,0 +1,13 @@
+[{"stream_name":"stdout","time":1.969624416,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":1.9696942910000002,"data":"Single-Config Evaluation: XOR CORR alpha=0.2\n"}
+,{"stream_name":"stdout","time":1.969701976,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":1.969707295,"data":"Searching for XOR_CORR_alpha0.2.npz in /kaggle/input/xai-tris-xor-corr/xai_tris_data\n"}
+,{"stream_name":"stdout","time":1.969712306,"data":"ERROR: XOR_CORR_alpha0.2.npz not found in /kaggle/input/xai-tris-xor-corr/xai_tris_data\n"}
+,{"stream_name":"stdout","time":1.9697170480000001,"data":"Available files:\n"}
+,{"stream_name":"stderr","time":5.013110122,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":5.013150572,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":5.422921089,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":5.4229514309999995,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":7.189662338,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":8.581195646,"data":"[NbConvertApp] Writing 302147 bytes to __results__.html\n"}
+]

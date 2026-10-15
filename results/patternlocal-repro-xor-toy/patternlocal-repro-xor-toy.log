@@ -1,0 +1,40 @@
+[{"stream_name":"stdout","time":2.190401546,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":2.1905518920000002,"data":"XOR Suppressor Toy Problem — Smoke Test\n"}
+,{"stream_name":"stdout","time":2.190561746,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":9.339782745,"data":"\n"}
+,{"stream_name":"stdout","time":9.339835111,"data":"Test samples: 500\n"}
+,{"stream_name":"stdout","time":9.339841929,"data":"LIME suppressor (|w3| mean): 1.4031\n"}
+,{"stream_name":"stdout","time":9.339846145,"data":"PatternLocal suppressor (|a3| mean): 0.6802\n"}
+,{"stream_name":"stdout","time":9.339850479,"data":"LIME suppressor (normalized mean): 1.2907\n"}
+,{"stream_name":"stdout","time":9.339854042,"data":"PatternLocal suppressor (normalized mean): 0.0652\n"}
+,{"stream_name":"stdout","time":9.339856542,"data":"Suppression ratio (pattern/lime): 0.4848\n"}
+,{"stream_name":"stdout","time":9.339859104,"data":"\n"}
+,{"stream_name":"stdout","time":9.339861405,"data":"Sample LIME weights (first 3 test points):\n"}
+,{"stream_name":"stdout","time":9.339863898,"data":"  Point 0: w1=-1.1376, w2=2.7012, w3=3.8388\n"}
+,{"stream_name":"stdout","time":9.339866475000001,"data":"  Point 1: w1=-0.3110, w2=0.3103, w3=0.6213\n"}
+,{"stream_name":"stdout","time":9.339868969,"data":"  Point 2: w1=0.0000, w2=-0.0000, w3=-0.0000\n"}
+,{"stream_name":"stdout","time":9.339871349,"data":"\n"}
+,{"stream_name":"stdout","time":9.339873615,"data":"Sample PatternLocal weights (first 3 test points):\n"}
+,{"stream_name":"stdout","time":9.339876,"data":"  Point 0: a1=-0.1434, a2=0.3209, a3=-0.0078\n"}
+,{"stream_name":"stdout","time":9.339878598,"data":"  Point 1: a1=-1.6250, a2=1.5795, a3=0.0073\n"}
+,{"stream_name":"stdout","time":9.339880967,"data":"  Point 2: a1=0.0004, a2=-0.0002, a3=-0.0000\n"}
+,{"stream_name":"stdout","time":9.33988333,"data":"[RESULT] n_test: 500\n"}
+,{"stream_name":"stdout","time":9.339885925,"data":"[RESULT] lime_suppressor_mean: 1.4031\n"}
+,{"stream_name":"stdout","time":9.339888705,"data":"[RESULT] pattern_suppressor_mean: 0.6802\n"}
+,{"stream_name":"stdout","time":9.339891215,"data":"[RESULT] lime_suppressor_normalized_mean: 1.2907\n"}
+,{"stream_name":"stdout","time":9.339894845,"data":"[RESULT] pattern_suppressor_normalized_mean: 0.0652\n"}
+,{"stream_name":"stdout","time":9.339898321,"data":"[RESULT] suppression_ratio: 0.4848\n"}
+,{"stream_name":"stdout","time":9.339901966,"data":"[RESULT] suppressor_reduced: True\n"}
+,{"stream_name":"stdout","time":9.339905394,"data":"[RESULT] PASS: suppressor check\n"}
+,{"stream_name":"stdout","time":9.340237956,"data":"Results saved to /kaggle/working/xor_toy_results.json\n"}
+,{"stream_name":"stdout","time":9.340262409,"data":"\n"}
+,{"stream_name":"stdout","time":9.340267324,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":9.340271616,"data":"XOR toy problem complete.\n"}
+,{"stream_name":"stdout","time":9.340276366,"data":"============================================================\n"}
+,{"stream_name":"stderr","time":12.290419734,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":12.290468103,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":12.770311006,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":12.77037274,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":14.748522272,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":16.069900243,"data":"[NbConvertApp] Writing 287652 bytes to __results__.html\n"}
+]

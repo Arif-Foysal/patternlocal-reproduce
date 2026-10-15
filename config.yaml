@@ -1,0 +1,109 @@
+project:
+  slug: patternlocal-repro
+
+kaggle:
+  username: mdariffaysalnayem
+  datasets:
+    core: mdariffaysalnayem/patternlocal-repro-core
+    xai_tris_data: mdariffaysalnayem/xai-tris-xor-corr
+    xai_tris_results: ""
+    full_results: ""
+
+pipeline:
+  phases:
+    phase1:
+      description: "XOR suppressor toy problem (smoke test)"
+      notebooks:
+        - id: xor_toy
+          gpu: false
+          datasets: []
+          success_criteria:
+            - "patternlocal_suppressor < 0.1 * lime_suppressor"
+
+    phase2_lin_corr:
+      description: "XAI-TRIS LIN CORR data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "LIN", "--noise", "CORR"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase2_lin_white:
+      description: "XAI-TRIS LIN WHITE data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "LIN", "--noise", "WHITE"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase2_xor_corr:
+      description: "XAI-TRIS XOR CORR data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "XOR", "--noise", "CORR"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase2_xor_white:
+      description: "XAI-TRIS XOR WHITE data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "XOR", "--noise", "WHITE"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase2_rigid_corr:
+      description: "XAI-TRIS RIGID CORR data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "RIGID", "--noise", "CORR"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase2_rigid_white:
+      description: "XAI-TRIS RIGID WHITE data generation"
+      notebooks:
+        - id: xai_tris_scenario
+          gpu: false
+          datasets: []
+          args: ["--scenario", "RIGID", "--noise", "WHITE"]
+          success_criteria:
+            - "all 9 alphas complete"
+            - "test accuracy > 90%"
+
+    phase3:
+      description: "Single-config evaluation (XOR CORR alpha=0.2)"
+      notebooks:
+        - id: xai_tris_eval
+          gpu: false
+          datasets:
+            - xai_tris_data
+          success_criteria:
+            - "patternlocal_emd < lime_emd"
+            - "patternlocal_ime < lime_ime"
+
+    phase4:
+      description: "Full Figure 4 reproduction (54 configs, 200 TPE trials)"
+      notebooks:
+        - id: full_repro
+          gpu: false
+          datasets:
+            - xai_tris_data
+          success_criteria:
+            - "all 54 configs complete"
+            - "patternlocal outperforms LIME in XOR and RIGID"

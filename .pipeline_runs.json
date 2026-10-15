@@ -1,0 +1,30 @@
+{
+  "mdariffaysalnayem/patternlocal-repro-xor-toy": {
+    "notebook": "templates/xor_toy.py",
+    "pushed_at": "2026-10-15T21:09:31.687604"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-data": {
+    "notebook": "templates/xai_tris_data.py",
+    "pushed_at": "2026-10-16T00:10:50.686496"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr": {
+    "notebook": "templates/xai_tris_lin_corr.py",
+    "pushed_at": "2026-10-16T00:24:24.651481"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr": {
+    "notebook": "templates/xai_tris_xor_corr.py",
+    "pushed_at": "2026-10-16T00:24:33.479411"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white": {
+    "notebook": "templates/xai_tris_lin_white.py",
+    "pushed_at": "2026-10-16T00:24:45.743236"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white": {
+    "notebook": "templates/xai_tris_xor_white.py",
+    "pushed_at": "2026-10-16T00:24:55.381035"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-eval": {
+    "notebook": "templates/xai_tris_eval.py",
+    "pushed_at": "2026-10-16T02:30:48.550762"
+  }
+}

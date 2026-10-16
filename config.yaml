@@ -108,6 +108,26 @@ pipeline:
             - "analytical_better_emd_vs_lime"
             - "analytical_better_ime_vs_lime"
 
+    phase3_analytical_sg:
+      description: "Targeted evaluation: Analytical gradient vs SmoothGrad"
+      notebooks:
+        - id: xai_tris_eval_sg2
+          gpu: false
+          datasets:
+            - xai_tris_xor_corr
+          success_criteria:
+            - "smoothgrad_better_emd_vs_lime"
+
+    phase3_analytical_ig:
+      description: "Targeted evaluation: Analytical gradient vs Integrated Gradients"
+      notebooks:
+        - id: xai_tris_eval_analytical_ig
+          gpu: false
+          datasets:
+            - xai_tris_xor_corr
+          success_criteria:
+            - "ig_better_emd_vs_lime"
+
     phase4:
       description: "Full Figure 4 reproduction (54 configs, 200 TPE trials)"
       notebooks:

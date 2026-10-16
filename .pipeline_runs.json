@@ -25,10 +25,22 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-eval": {
     "notebook": "templates/xai_tris_eval.py",
-    "pushed_at": "2026-10-16T14:44:21.840147"
+    "pushed_at": "2026-10-16T18:15:12.991682"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-eval-analytical": {
     "notebook": "templates/xai_tris_eval_analytical.py",
     "pushed_at": "2026-10-16T17:19:24.150924"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-eval-sg": {
+    "notebook": "templates/xai_tris_eval_sg.py",
+    "pushed_at": "2026-10-16T18:15:24.133866"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-eval-sg2": {
+    "notebook": "templates/xai_tris_eval_sg2.py",
+    "pushed_at": "2026-10-16T18:16:52.204828"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xai-tris-eval-analytical-ig": {
+    "notebook": "templates/xai_tris_eval_analytical_ig.py",
+    "pushed_at": "2026-10-16T19:12:49.201378"
   }
 }

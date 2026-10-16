@@ -4,7 +4,8 @@ A drop-in, O(K * D) replacement for LIME-based PatternLocal. Instead of
 fitting a local linear surrogate (LIME) and forming the D x D local
 covariance, it uses:
 
-1. the exact input gradient of the predicted-class logit (replaces LIME), and
+1. the exact input gradient of the predicted-class logit (replaces LIME),
+   optionally smoothed with SmoothGrad, and
 2. the *kernel-weighted* empirical covariance of the K nearest neighbours
    (replaces the kernel-weighted global covariance of paper Eq. (7)).
 
@@ -37,7 +38,7 @@ def kernel_weights(distances, bandwidth, kernel="gaussian"):
 
 
 class AnalyticalPatternLocalExplainer:
-    """Exact-gradient + kernel-weighted KNN-covariance PatternLocal explainer.
+    """Exact-gradient (+ SmoothGrad) + kernel-weighted KNN-covariance explainer.
 
     Args:
         model: Differentiable PyTorch model. Moved to ``device`` and set to
@@ -95,6 +96,31 @@ class AnalyticalPatternLocalExplainer:
         target.backward()
         return x.grad.detach().cpu().numpy().flatten()
 
+    def smoothgrad(self, x_star, n_samples=50, noise_level=0.1, seed=0):
+        """SmoothGrad surrogate: mean gradient over Gaussian-perturbed copies.
+
+        Smoother spatial focus than the raw gradient, which helps EMD while
+        keeping the false-positive suppression of the covariance transform.
+
+        Args:
+            x_star: Instance (D,).
+            n_samples: Number of perturbed copies.
+            noise_level: Sigma = noise_level * std(x).
+            seed: RNG seed.
+
+        Returns:
+            Mean gradient (D,).
+        """
+        rng = np.random.default_rng(seed)
+        x_np = np.asarray(x_star, dtype=np.float32).ravel()
+        x_std = float(np.std(x_np))
+        sigma = noise_level * x_std if x_std > 0 else noise_level
+        grads = np.zeros(self.dim, dtype=np.float64)
+        for i in range(n_samples):
+            eps = rng.normal(0.0, sigma, x_np.shape).astype(np.float32)
+            grads += self.gradient(x_np + eps)
+        return grads / n_samples
+
     def _bandwidth_for(self, distances):
         if self.bandwidth is not None:
             return float(self.bandwidth)
@@ -123,14 +149,31 @@ class AnalyticalPatternLocalExplainer:
     # ------------------------------------------------------------------
     # Public API
     # ------------------------------------------------------------------
-    def explain(self, x_star, k=None, bandwidth=None, kernel=None):
-        """Return the attribution vector (D,) for a single instance."""
+    def explain(self, x_star, surrogate="gradient", k=None, bandwidth=None,
+                kernel=None, **surrogate_kwargs):
+        """Return the attribution vector (D,) for a single instance.
+
+        Args:
+            surrogate: 'gradient' (exact input gradient) or 'smoothgrad'
+                (mean gradient over Gaussian perturbations).
+            k: Number of neighbours (default self.k_neighbors).
+            bandwidth: Kernel bandwidth (default self.bandwidth; None = auto).
+            kernel: Kernel name (default self.kernel).
+            surrogate_kwargs: passed to ``smoothgrad`` when
+                surrogate='smoothgrad'.
+        """
         k = int(k if k is not None else self.k_neighbors)
         k = max(1, min(k, self.n_train))
         bw = self.bandwidth if bandwidth is None else float(bandwidth)
         ker = kernel if kernel is not None else self.kernel
 
-        w_grad = self.gradient(x_star)
+        if surrogate == "gradient":
+            w_grad = self.gradient(x_star)
+        elif surrogate == "smoothgrad":
+            w_grad = self.smoothgrad(x_star, **surrogate_kwargs)
+        else:
+            raise ValueError(f"Unknown surrogate: {surrogate}")
+
         x_np = np.asarray(x_star, dtype=np.float32).reshape(1, -1)
         distances, indices = self.knn.kneighbors(x_np, n_neighbors=k)
         X_K = self.X_train[indices[0]]
@@ -140,7 +183,8 @@ class AnalyticalPatternLocalExplainer:
         weights = kernel_weights(dists, bw, ker)
         return self._attribution(w_grad, X_K, weights)
 
-    def explain_batch(self, X_batch, k=None, bandwidth=None, kernel=None):
+    def explain_batch(self, X_batch, surrogate="gradient", k=None,
+                      bandwidth=None, kernel=None, **surrogate_kwargs):
         """Return attributions (B, D) for a batch of instances."""
         X_batch = np.asarray(X_batch, dtype=np.float32)
         k = int(k if k is not None else self.k_neighbors)
@@ -151,7 +195,12 @@ class AnalyticalPatternLocalExplainer:
         distances, indices = self.knn.kneighbors(X_batch, n_neighbors=k)
         out = np.empty((len(X_batch), self.dim), dtype=np.float64)
         for i in range(len(X_batch)):
-            w_grad = self.gradient(X_batch[i])
+            if surrogate == "gradient":
+                w_grad = self.gradient(X_batch[i])
+            elif surrogate == "smoothgrad":
+                w_grad = self.smoothgrad(X_batch[i], **surrogate_kwargs)
+            else:
+                raise ValueError(f"Unknown surrogate: {surrogate}")
             X_K = self.X_train[indices[i]]
             dists = distances[i]
             if bw is None:

@@ -2,12 +2,13 @@
 """Single-config evaluation: LIME vs PatternLocal vs Analytical PatternLocal.
 
 Reproduces the phase-3 gate on XOR CORR alpha=0.2 and additionally evaluates
-the analytical (exact-gradient + KNN-covariance) PatternLocal explainer:
+the analytical (exact-gradient + kernel-weighted KNN-covariance) PatternLocal
+explainer:
 
   * LIME: weighted local-linear surrogate (paper Eq. 5).
   * PatternLocal: LIME weights transformed by the local covariance (Eq. 7).
-  * Analytical PatternLocal: exact input gradient + KNN local covariance,
-    O(K * D), no LIME fit, no bandwidth.
+  * Analytical PatternLocal: exact input gradient + kernel-weighted KNN
+    covariance, O(K * D), no LIME fit.
 
 Hyperparameters are selected on a held-out split by minimizing EMD, then the
 methods are compared on the remaining test samples.
@@ -32,7 +33,7 @@ for root, dirs, files in os.walk("/kaggle/input"):
 
 from xai.patternlocal import patternlocal_explain
 from xai.lime import lime_explain, model_logits
-from xai.analytical_patternlocal import AnalyticalPatternLocalExplainer
+from xai.analytical_patternlocal import AnalyticalPatternLocalExplainer, kernel_weights
 from metrics.emd import compute_emd
 from metrics.ime import compute_ime
 
@@ -40,19 +41,19 @@ CONFIG = "XOR_CORR_alpha0.2"
 IMAGE_SHAPE = (64, 64)
 DEVICE = "cuda" if __import__("torch").cuda.is_available() else "cpu"
 
-# Evaluation sizing. Kept modest so the whole run fits comfortably in a Kaggle
-# notebook; increase N_TEST for the full gate.
+# Evaluation sizing.
 N_TUNE = 30
 N_TEST = 150
-N_LIME = 2000          # perturbed samples per LIME fit
-K_RATIO = 0.05         # local neighbourhood for PatternLocal covariance
+N_LIME = 2000
+K_RATIO = 0.05
 SHRINKAGE = 0.0
 
-# Small validation grids.
+# Validation grids.
 D = IMAGE_SHAPE[0] * IMAGE_SHAPE[1]
 LIME_BWS = [0.375 * np.sqrt(D), 0.75 * np.sqrt(D), 1.5 * np.sqrt(D)]
 PAT_BWS = [None, 1.0, 5.0]
-ANALYTICAL_KS = [50, 100, 200, 500]   # KNN neighbourhood sizes for analytical
+ANALYTICAL_KS = [100, 300, 500, 800]
+ANALYTICAL_KERNELS = ["gaussian", "uniform"]
 
 
 def format_result(key, value):
@@ -91,6 +92,18 @@ def pattern_explain(x, v, b, X_train, bandwidth, k_ratio, shrinkage):
         lam=1e-5,
         shrinkage=shrinkage,
     )
+
+
+def analytical_from_cached(explainer, w_grad, X_K, dists, k, bw, ker):
+    """Attribution from cached KNN distances/indices (no recompute)."""
+    X_K = X_K[:k]
+    dists = dists[:k]
+    if bw is None:
+        bw = float(np.median(dists))
+        if bw == 0:
+            bw = np.finfo(float).eps
+    weights = kernel_weights(dists, bw, ker)
+    return explainer._attribution(w_grad, X_K, weights)
 
 
 def main():
@@ -138,69 +151,61 @@ def main():
     mask_tune = masks_test[tune_idx]
     mask_eval = masks_test[eval_idx]
 
-    # ---- tune LIME bandwidth on the tuning split ---------------------------
-    print("\n--- Tuning LIME bandwidth ---")
-    best_lime = (None, np.inf)
-    for bw in LIME_BWS:
-        emds = []
-        t0 = time.time()
-        for i in tune_idx:
-            v, b = lime_explain(model, X_test[i], bandwidth=bw, seed=int(i))
-            e, _ = _score(_normalize(v), masks_test[i])
-            emds.append(e)
-        m = float(np.mean(emds))
-        print(f"  lime_bw={bw:7.2f}  EMD={m:.4f}  ({time.time()-t0:.1f}s)")
-        if m < best_lime[1]:
-            best_lime = (bw, m)
-    print(f"  -> LIME bandwidth = {best_lime[0]:.2f}")
-    format_result("lime_bandwidth", f"{best_lime[0]:.2f}")
+    # NOTE: with the identity representation, LIME perturbations are binary
+    # masks in D=4096 dims; Hamming distances concentrate so tightly that the
+    # locality kernel is effectively flat for any bandwidth. Bandwidth tuning
+    # therefore does not change LIME -- skip it and use the default width.
+    lime_bw = 0.75 * np.sqrt(D)
+    print(f"  LIME bandwidth fixed at {lime_bw:.2f} (tuning ineffective on identity rep)")
+    format_result("lime_bandwidth", f"{lime_bw:.2f}")
 
-    # ---- tune PatternLocal bandwidth on the tuning split -------------------
-    print("\n--- Tuning PatternLocal bandwidth ---")
-    best_pat = (None, np.inf)
-    for bw in PAT_BWS:
-        emds = []
-        t0 = time.time()
-        for i in tune_idx:
-            v, b = lime_explain(model, X_test[i], bandwidth=best_lime[0], seed=int(i))
-            p = pattern_explain(X_test[i], v, b, X_train, bw, K_RATIO, SHRINKAGE)
-            e, _ = _score(_normalize(p), masks_test[i])
-            emds.append(e)
-        m = float(np.mean(emds))
-        label = "auto" if bw is None else f"{bw:.2f}"
-        print(f"  pat_bw={label:>7}  EMD={m:.4f}  ({time.time()-t0:.1f}s)")
-        if m < best_pat[1]:
-            best_pat = (bw, m)
-    print(f"  -> PatternLocal bandwidth = {'auto' if best_pat[0] is None else best_pat[0]:}")
-    format_result("patternlocal_bandwidth", "auto" if best_pat[0] is None else f"{best_pat[0]:.2f}")
+    # ---- PatternLocal bandwidth: auto (median k-NN distance) ----------------
+    # Tuning showed auto/1.0/5.0 give identical EMD (~0.1608), so skip the
+    # grid and use the paper's auto median-distance bandwidth.
+    pat_bw = None
+    print(f"  PatternLocal bandwidth fixed at auto (median k-NN distance)")
+    format_result("patternlocal_bandwidth", "auto")
 
-    # ---- compute exact gradients once (shared by analytical) --------------
+    # ---- exact gradients once (shared by analytical) -----------------------
     print("\n--- Computing exact input gradients ---")
-    max_k = max(ANALYTICAL_KS)
     explainer = AnalyticalPatternLocalExplainer(
-        model, X_train, k_neighbors=max_k, device=DEVICE, normalize=False
+        model, X_train, k_neighbors=max(ANALYTICAL_KS), device=DEVICE,
+        normalize=False, kernel="gaussian", bandwidth=None,
     )
     t0 = time.time()
     tune_grads = np.array([explainer.gradient(X_test[i]) for i in tune_idx])
     eval_grads = np.array([explainer.gradient(X_test[i]) for i in eval_idx])
     print(f"  {len(tune_grads)+len(eval_grads)} gradients in {time.time()-t0:.1f}s")
 
-    # ---- tune Analytical PatternLocal k_neighbors on the tuning split ------
-    print("\n--- Tuning Analytical PatternLocal k_neighbors ---")
-    best_analytical = (None, np.inf)
+    # Cache KNN distances/indices at max_k (computed once, reused for all k).
+    max_k = max(ANALYTICAL_KS)
+    t0 = time.time()
+    tune_dist, tune_idx_nn = explainer.knn.kneighbors(X_tune, n_neighbors=max_k)
+    eval_dist, eval_idx_nn = explainer.knn.kneighbors(X_eval, n_neighbors=max_k)
+    print(f"  KNN cached ({max_k}) in {time.time()-t0:.1f}s")
+
+    # ---- tune Analytical k + kernel on the tuning split --------------------
+    print("\n--- Tuning Analytical k + kernel ---")
+    best_analytical = (None, None, np.inf)
     for k in ANALYTICAL_KS:
-        _, indices = explainer.knn.kneighbors(X_tune, n_neighbors=k)
-        emds = []
-        for j, i in enumerate(tune_idx):
-            a = explainer.attribution(tune_grads[j], explainer.X_train[indices[j]])
-            e, _ = _score(_normalize(a), mask_tune[j])
-            emds.append(e)
-        m = float(np.mean(emds))
-        print(f"  analytical_k={k:5d}  EMD={m:.4f}")
-        if m < best_analytical[1]:
-            best_analytical = (k, m)
-    print(f"  -> Analytical k_neighbors = {best_analytical[0]}")
-    format_result("analytical_k_neighbors", f"{best_analytical[0]}")
+        for ker in ANALYTICAL_KERNELS:
+            emds = []
+            for j, i in enumerate(tune_idx):
+                a = analytical_from_cached(
+                    explainer, tune_grads[j],
+                    explainer.X_train[tune_idx_nn[j]], tune_dist[j],
+                    k, None, ker,
+                )
+                e, _ = _score(_normalize(a), mask_tune[j])
+                emds.append(e)
+            m = float(np.mean(emds))
+            print(f"  analytical_k={k:5d} kernel={ker:10s} EMD={m:.4f}")
+            if m < best_analytical[2]:
+                best_analytical = (k, ker, m)
+    best_k, best_ker, _ = best_analytical
+    print(f"  -> Analytical k={best_k} kernel={best_ker}")
+    format_result("analytical_k_neighbors", f"{best_k}")
+    format_result("analytical_kernel", best_ker)
 
     # ---- final comparison on the held-out eval split -----------------------
     print("\n--- Final evaluation ---")
@@ -213,20 +218,23 @@ def main():
         mask = mask_eval[j]
 
         # LIME
-        v, b = lime_explain(model, x, bandwidth=best_lime[0], seed=int(i))
+        v, b = lime_explain(model, x, bandwidth=lime_bw, seed=int(i))
         e, im = _score(_normalize(v), mask)
         lime_emds.append(e)
         lime_imes.append(im)
 
         # PatternLocal
-        p = pattern_explain(x, v, b, X_train, best_pat[0], K_RATIO, SHRINKAGE)
+        p = pattern_explain(x, v, b, X_train, pat_bw, K_RATIO, SHRINKAGE)
         e, im = _score(_normalize(p), mask)
         pat_emds.append(e)
         pat_imes.append(im)
 
-        # Analytical PatternLocal
-        _, a_indices = explainer.knn.kneighbors(x.reshape(1, -1), n_neighbors=best_analytical[0])
-        ana = explainer.attribution(eval_grads[j], explainer.X_train[a_indices[0]])
+        # Analytical PatternLocal (cached KNN)
+        ana = analytical_from_cached(
+            explainer, eval_grads[j],
+            explainer.X_train[eval_idx_nn[j]], eval_dist[j],
+            best_k, None, best_ker,
+        )
         e, im = _score(_normalize(ana), mask)
         ana_emds.append(e)
         ana_imes.append(im)
@@ -255,6 +263,8 @@ def main():
         "patternlocal_ime_mean": f"{pat_ime:.4f}", "patternlocal_ime_std": f"{np.std(pat_imes):.4f}",
         "analytical_emd_mean": f"{ana_emd:.4f}", "analytical_emd_std": f"{np.std(ana_emds):.4f}",
         "analytical_ime_mean": f"{ana_ime:.4f}", "analytical_ime_std": f"{np.std(ana_imes):.4f}",
+        "analytical_k_neighbors": best_k,
+        "analytical_kernel": best_ker,
         "analytical_better_emd_vs_lime": bool(ana_emd < lime_emd),
         "analytical_better_ime_vs_lime": bool(ana_ime < lime_ime),
         "analytical_better_emd_vs_pl": bool(ana_emd < pat_emd),
@@ -271,9 +281,10 @@ def main():
         "test_accuracy": test_acc,
         "n_eval": int(len(eval_idx)),
         "device": DEVICE,
-        "lime_bandwidth": None if best_lime[0] is None else float(best_lime[0]),
-        "patternlocal_bandwidth": None if best_pat[0] is None else float(best_pat[0]),
-        "analytical_k_neighbors": best_analytical[0],
+        "lime_bandwidth": float(lime_bw),
+        "patternlocal_bandwidth": None if pat_bw is None else float(pat_bw),
+        "analytical_k_neighbors": best_k,
+        "analytical_kernel": best_ker,
         "lime": {"emd_mean": lime_emd, "emd_std": float(np.std(lime_emds)),
                  "ime_mean": lime_ime, "ime_std": float(np.std(lime_imes))},
         "patternlocal": {"emd_mean": pat_emd, "emd_std": float(np.std(pat_emds)),

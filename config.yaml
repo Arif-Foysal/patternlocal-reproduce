@@ -97,6 +97,17 @@ pipeline:
             - "patternlocal_emd < lime_emd"
             - "patternlocal_ime < lime_ime"
 
+    phase3_analytical:
+      description: "Single-config evaluation: LIME vs PatternLocal vs Analytical PatternLocal"
+      notebooks:
+        - id: xai_tris_eval_analytical
+          gpu: false
+          datasets:
+            - xai_tris_xor_corr
+          success_criteria:
+            - "analytical_better_emd_vs_lime"
+            - "analytical_better_ime_vs_lime"
+
     phase4:
       description: "Full Figure 4 reproduction (54 configs, 200 TPE trials)"
       notebooks:

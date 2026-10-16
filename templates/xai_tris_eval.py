@@ -30,6 +30,7 @@ for root, dirs, files in os.walk("/kaggle/input"):
         break
 
 from xai.patternlocal import patternlocal_explain
+from xai.lime import lime_explain, model_logits
 from metrics.emd import compute_emd
 from metrics.ime import compute_ime
 
@@ -64,66 +65,6 @@ def save_results(results_dict, path="/kaggle/working/eval_results.json"):
 def find_file(pattern):
     matches = glob.glob(os.path.join("/kaggle/input", "**", pattern), recursive=True)
     return matches[0] if matches else None
-
-
-# ---------------------------------------------------------------------------
-# LIME (paper Eq. 5) with the identity representation
-# ---------------------------------------------------------------------------
-
-def _model_logits(model, X, batch_size=256):
-    import torch
-
-    model.eval()
-    outs = []
-    with torch.no_grad():
-        for i in range(0, len(X), batch_size):
-            xb = torch.FloatTensor(np.asarray(X[i:i + batch_size], dtype=np.float32))
-            outs.append(model(xb).numpy())
-    return np.concatenate(outs, axis=0)
-
-
-def lime_explain(model, x, n_samples=N_LIME, bandwidth=0.75 * np.sqrt(D),
-                 lam=1.0, seed=0):
-    """Weighted local-linear LIME surrogate (Eq. 5).
-
-    Samples binary masks z, maps them back with h^-1(z) = x * z (reference 0),
-    evaluates the model logit of the predicted class, and fits a weighted ridge
-    regression of the logit on z. Returns (weights, intercept).
-    """
-    rng = np.random.default_rng(seed)
-    z = (rng.random((n_samples, D)) < 0.5).astype(np.float64)
-    Xp = x[None, :] * z
-
-    logits = _model_logits(model, Xp)
-    pred = logits.argmax(axis=1)
-    y = logits[np.arange(n_samples), pred]
-
-    dist2 = ((1.0 - z) ** 2).sum(axis=1)
-    w = np.exp(-dist2 / (bandwidth ** 2))
-    W = w / w.sum()
-
-    zbar = W @ z
-    ybar = W @ y
-    zc = z - zbar
-    yc = y - ybar
-
-    # Weighted ridge via the Woodbury identity. The direct solve is D x D
-    # (4096 x 4096); Woodbury reduces it to n x n (n_samples x n_samples),
-    # which is much faster. Using the symmetric form for numerical stability:
-    #   (Zc^T W Zc + lam I)^-1 Zc^T W yc
-    #     = (S Zc)^T (lam I + (S Zc)(S Zc)^T)^-1 (S yc),  S = sqrt(W)
-    # float32 + Cholesky keeps this to ~1-2s per fit.
-    import scipy.linalg as sla
-
-    zc32 = zc.astype(np.float32)
-    s32 = np.sqrt(W).astype(np.float32)
-    SZc = zc32 * s32[:, None]
-    G = SZc @ SZc.T + np.float32(lam) * np.eye(n_samples, dtype=np.float32)
-    c, low = sla.cho_factor(G)
-    alpha = sla.cho_solve((c, low), s32 * yc.astype(np.float32))
-    v = (SZc.T @ alpha).astype(np.float64)
-    b = ybar - v @ zbar
-    return v, b
 
 
 def pattern_explain(x, v, b, X_train, bandwidth, k_ratio, shrinkage):
@@ -179,7 +120,7 @@ def main():
     model.load_state_dict(torch.load(model_path, weights_only=True))
     model.eval()
 
-    test_acc = float((_model_logits(model, X_test).argmax(axis=1) == y_test).mean())
+    test_acc = float((model_logits(model, X_test).argmax(axis=1) == y_test).mean())
     print(f"Test accuracy: {test_acc:.4f}")
     format_result("test_accuracy", f"{test_acc:.4f}")
 

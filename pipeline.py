@@ -137,14 +137,26 @@ def cmd_upload_src(config):
         shutil.rmtree(dataset_dir)
     dataset_dir.mkdir(exist_ok=True)
 
-    # Copy all Python files and subdirectories from src/
-    for item in SRC_DIR.iterdir():
-        if item.is_file() and item.suffix == ".py":
+    # Copy src/ into the dataset root, flattening package directories so that
+    # the modules the notebooks import (data, models, xai, metrics,
+    # experiments) sit at the dataset root and are importable on Kaggle
+    # without manual sys.path edits.
+    for item in sorted(SRC_DIR.iterdir()):
+        if item.name == "__pycache__":
+            continue
+        if item.is_dir():
+            for sub in sorted(item.iterdir()):
+                if sub.name == "__pycache__":
+                    continue
+                if sub.is_file() and sub.suffix == ".py":
+                    shutil.copy2(sub, dataset_dir / sub.name)
+                    print(f"  + {sub.name}")
+                elif sub.is_dir():
+                    shutil.copytree(sub, dataset_dir / sub.name)
+                    print(f"  + {sub.name}/ (directory)")
+        elif item.is_file() and item.suffix == ".py":
             shutil.copy2(item, dataset_dir / item.name)
             print(f"  + {item.name}")
-        elif item.is_dir():
-            shutil.copytree(item, dataset_dir / item.name)
-            print(f"  + {item.name}/ (directory)")
 
     for extra in config["kaggle"].get("core_extras", []) or []:
         p = PIPELINE_DIR / extra

@@ -1,0 +1,18 @@
+# Secrets / local credentials
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.egg-info/
+
+# Pipeline working dirs
+_kaggle_*/
+
+# Local working copies and downloaded outputs
+notebooks/
+results/
+
+# OS / editor
+.DS_Store

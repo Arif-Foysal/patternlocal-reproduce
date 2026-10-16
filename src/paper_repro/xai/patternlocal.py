@@ -31,9 +31,10 @@ def patternlocal_explain(
     X_train,
     bandwidth=None,
     kernel="gaussian",
-    k_ratio=0.1,
+    k_ratio=1.0,
     lam=1e-5,
     use_global_cov=False,
+    shrinkage=0.0,
 ):
     """Compute PatternLocal explanation following paper Eq. (7).
 
@@ -48,6 +49,9 @@ def patternlocal_explain(
         lam: Ridge regularization parameter (default 1e-5)
         use_global_cov: If True, use global covariance (all data, uniform weights).
                        Matches theoretical XOR toy problem in Section 3.2.
+        shrinkage: Ledoit-Wolf-style shrinkage intensity in [0, 1]. Shrinks the
+                       local covariance toward avg_variance * I for stability in
+                       high dimensions (matches upstream PatternLocal).
 
     Returns:
         pattern_weights: PatternLocal explanation (D,)
@@ -82,9 +86,14 @@ def patternlocal_explain(
     diffs = X_local - weighted_mean
 
     # Local/global covariance matrix: C = sum_i w_i * diffs_i * diffs_i^T
-    C = np.zeros((d, d))
-    for i in range(len(weights)):
-        C += weights[i] * np.outer(diffs[i], diffs[i])
+    # Vectorized (weighted_diffs.T @ diffs) — equivalent to a loop of
+    # np.outer calls but ~100x faster and avoids 500x134MB allocations.
+    weighted_diffs = weights[:, None] * diffs
+    C = weighted_diffs.T @ diffs
+
+    if shrinkage and shrinkage > 0:
+        avg_variance = float(np.mean(np.diag(C)))
+        C = (1.0 - shrinkage) * C + shrinkage * (avg_variance * np.eye(d))
 
     # PatternLocal weights: a = C * w / (w^T * C * w + lambda)
     Cw = C @ lime_weights

@@ -22,6 +22,7 @@ only the direction of ``C_K w`` matters.
 
 import numpy as np
 import torch
+from sklearn.linear_model import Lasso, ElasticNet
 from sklearn.neighbors import NearestNeighbors
 
 
@@ -121,6 +122,34 @@ class AnalyticalPatternLocalExplainer:
             grads += self.gradient(x_np + eps)
         return grads / n_samples
 
+    def integrated_gradients(self, x_star, steps=50, baseline=None, seed=0):
+        """Integrated Gradients surrogate: mean gradient along path baseline->x.
+
+        Satisfies completeness; smoother spatial focus than raw gradient, which
+        helps EMD while keeping IME low.
+
+        Args:
+            x_star: Instance (D,).
+            steps: Number of interpolated steps.
+            baseline: Baseline instance (D,), defaults to zeros.
+            seed: Unused (kept for signature consistency with smoothgrad).
+
+        Returns:
+            Integrated gradients (D,).
+        """
+        x_np = np.asarray(x_star, dtype=np.float32).ravel()
+        if baseline is None:
+            baseline = np.zeros_like(x_np)
+        else:
+            baseline = np.asarray(baseline, dtype=np.float32).ravel()
+        grads = np.zeros(self.dim, dtype=np.float64)
+        for s in range(1, steps + 1):
+            alpha = s / steps
+            interpolated = baseline + alpha * (x_np - baseline)
+            grads += self.gradient(interpolated)
+        grads /= steps
+        return (x_np - baseline) * grads
+
     def _bandwidth_for(self, distances):
         if self.bandwidth is not None:
             return float(self.bandwidth)
@@ -145,6 +174,123 @@ class AnalyticalPatternLocalExplainer:
             if max_abs > 0:
                 a = a / max_abs
         return a
+
+    def analytical_attr_lasso(self, x_star, grad_vector, dists, idx_nn, k,
+                               alpha=0.01):
+        """Analytical-IG attribution with L1 Lasso regression.
+
+        Solves: argmin_a ||X_K @ a - y||^2 + alpha * ||a||_1
+        where y = X_K @ grad_vector (IG's local linear predictions).
+        Input simplification uses identity mapping h(x) = x.
+
+        Args:
+            x_star: Instance to explain (D,).
+            grad_vector: IG attribution vector (D,).
+            dists: Distances to K neighbors (max_k,).
+            idx_nn: Indices of K neighbors (max_k,).
+            k: Number of neighbors to use.
+            alpha: Lasso L1 regularization strength.
+
+        Returns:
+            attribution: Analytical-IG-Lasso explanation (D,).
+        """
+        dists = np.asarray(dists).ravel()
+        idx_nn = np.asarray(idx_nn).ravel()
+        X_K = self.X_train[idx_nn[:k]]
+        dists_k = dists[:k]
+        bw = float(np.median(dists_k))
+        if bw == 0:
+            bw = np.finfo(float).eps
+        weights = kernel_weights(dists_k, bw, self.kernel)
+        weight_sum = weights.sum()
+        if weight_sum <= 0:
+            raise ValueError("Kernel weights sum to zero.")
+        weights = weights / weight_sum
+
+        # Target: IG's local linear predictions (identity mapping h(x) = x)
+        y = X_K @ grad_vector
+
+        # Standardize features — REQUIRED for Lasso L1 penalty to be fair
+        # across features with different scales.
+        X_mean = X_K.mean(axis=0)
+        X_std = X_K.std(axis=0)
+        X_std[X_std == 0] = 1.0
+        X_K_std = (X_K - X_mean) / X_std
+
+        y_mean = y.mean()
+        y_std = y.std()
+        if y_std == 0:
+            y_std = 1.0
+        y_std_centered = (y - y_mean) / y_std
+
+        # Weighted L1 Lasso regression on standardized data
+        model = Lasso(alpha=alpha, fit_intercept=False, max_iter=10000,
+                      random_state=42)
+        model.fit(X_K_std, y_std_centered, sample_weight=weights)
+
+        # Transform coefficients back to original scale
+        attribution = model.coef_ * (y_std / X_std)
+
+        return attribution
+
+    def analytical_attr_elastic_net(self, x_star, grad_vector, dists, idx_nn, k,
+                                     alpha=0.0001, l1_ratio=0.1):
+        """Analytical-IG attribution with Elastic Net regression (L1 + L2).
+
+        The L2 component encourages grouped selection of correlated pixels,
+        producing denser attribution maps than pure Lasso.
+
+        Args:
+            x_star: Instance to explain (D,).
+            grad_vector: IG attribution vector (D,).
+            dists: Distances to K neighbors (max_k,).
+            idx_nn: Indices of K neighbors (max_k,).
+            k: Number of neighbors to use.
+            alpha: Elastic Net overall regularization strength.
+            l1_ratio: Mixing parameter (0 = pure Ridge, 1 = pure Lasso).
+
+        Returns:
+            attribution: Analytical-IG-ElasticNet explanation (D,).
+        """
+        dists = np.asarray(dists).ravel()
+        idx_nn = np.asarray(idx_nn).ravel()
+        X_K = self.X_train[idx_nn[:k]]
+        dists_k = dists[:k]
+        bw = float(np.median(dists_k))
+        if bw == 0:
+            bw = np.finfo(float).eps
+        weights = kernel_weights(dists_k, bw, self.kernel)
+        weight_sum = weights.sum()
+        if weight_sum <= 0:
+            raise ValueError("Kernel weights sum to zero.")
+        weights = weights / weight_sum
+
+        # Target: IG's local linear predictions (identity mapping h(x) = x)
+        y = X_K @ grad_vector
+
+        # Standardize features
+        X_mean = X_K.mean(axis=0)
+        X_std = X_K.std(axis=0)
+        X_std[X_std == 0] = 1.0
+        X_K_std = (X_K - X_mean) / X_std
+
+        y_mean = y.mean()
+        y_std = y.std()
+        if y_std == 0:
+            y_std = 1.0
+        y_std_centered = (y - y_mean) / y_std
+
+        # Weighted Elastic Net regression on standardized data
+        model = ElasticNet(
+            alpha=alpha, l1_ratio=l1_ratio, fit_intercept=False,
+            max_iter=10000, random_state=42,
+        )
+        model.fit(X_K_std, y_std_centered, sample_weight=weights)
+
+        # Transform coefficients back to original scale
+        attribution = model.coef_ * (y_std / X_std)
+
+        return attribution
 
     # ------------------------------------------------------------------
     # Public API

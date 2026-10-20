@@ -225,3 +225,33 @@ The paper's official repo (github.com/gjoelbye/PatternLocal) ships only the
 PatternLocal *method*, not the XAI-TRIS generator (that is from Clark et al.
 [8]), so the "randomly translated" wording is genuinely underspecified. The
 quadrant reading is the one that reproduces the paper's reported accuracy.
+
+### 7b. Validation with the real torch MLP (core v21:49, kernel `rigid-fix-validate`)
+| config | old test acc | **new test acc** |
+|---|---|---|
+| RIGID CORR a=0.2 | ~0.48 | **0.9883** |
+| RIGID CORR a=0.3 | ~0.50 | **0.9917** |
+| RIGID CORR a=0.5 | ~0.61 | **0.9967** |
+| RIGID WHITE a=0.2 | ~0.77 | **1.0000** |
+| RIGID WHITE a=0.3 | ~0.77 | **1.0000** |
+| RIGID WHITE a=0.5 | ~0.90 | **1.0000** |
+
+RIGID CORR alpha=0.3 (the paper's qualitative alpha) now clears the 90% gate,
+so the previous "alpha=0.4 skip is correct protocol" conclusion is superseded:
+the low-alpha RIGID regime is runnable and must be re-swept.
+
+### 7c. Filter baselines on the FIXED generator (alpha=0.6)
+| scenario | sobel EMD | laplace EMD | sobel IME | laplace IME |
+|---|---|---|---|---|
+| LIN WHITE | 0.0842 | 0.0866 | 0.663 | 0.738 |
+| LIN CORR  | 0.0473 | 0.0139 | 0.335 | 0.353 |
+| XOR WHITE | 0.0821 | 0.0863 | 0.652 | 0.738 |
+| XOR CORR  | 0.0379 | 0.0093 | 0.285 | 0.338 |
+| RIGID WHITE | 0.0979 | 0.1034 | 0.660 | 0.745 |
+| RIGID CORR | 0.0460 | 0.0114 | 0.296 | 0.317 |
+
+Filters are now **bad on WHITE** (EMD ~0.08-0.10, IME ~0.66-0.75) and only
+competitive on CORR — which is the paper's actual claim (they benefit from the
+smooth correlated noise aligning with smooth signal edges; IME ~0.3 shows 30%
+of their mass still lands outside the mask). The earlier "Laplace wins
+everywhere" impression was inflated by the RIGID generator bug.

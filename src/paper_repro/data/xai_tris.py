@@ -64,24 +64,68 @@ def smooth_signal(signal, sigma=1.5, threshold=0.05):
     return smoothed
 
 
-def apply_rigid_transform(signal, rng):
+def apply_rigid_transform(signal, rng, region=None, jitter=None):
     """Apply random 90-degree rotation and translation (zero-padded, no wrap).
 
     The paper applies R(n) as a rigid-body transformation: rotation in 90-degree
     increments followed by a translation.  ``np.roll`` would wrap foreground
     pixels around the image border, which is not a rigid transform of the image
     content, so we shift with zero filling instead.
+
+    Args:
+        signal: 2-D tetromino array.
+        rng: numpy Generator.
+        region: optional ``(y0, y1, x0, x1)`` half-open box that the *whole*
+            rotated shape must remain inside.  In the LIN scenario the paper
+            places the T-tetromino "near the top-left" and the L-tetromino "near
+            the bottom-right"; RIGID keeps the same separation and merely
+            translates/rotates each shape within its own region.  Without a
+            region constraint the two shapes frequently collide, and because the
+            RIGID signal is ``aT - aL`` for ``y=1`` the overlap cancels to zero
+            -- erasing class information and rendering the task unlearnable
+            (empirically ~0.50 test accuracy vs the paper's >0.90).
+        jitter: optional ``(dy_lo, dy_hi, dx_lo, dx_hi)`` bound (inclusive) on
+            the translation relative to the shape's current position.  Defaults
+            to the full range allowed by ``region`` (or by the frame).
+
+    Returns:
+        Translated array with the shape fully inside ``region``/frame.
     """
-    k = rng.integers(0, 4)
+    k = int(rng.integers(0, 4))
     rotated = np.rot90(signal, k)
 
-    max_shift = signal.shape[0] // 4
-    dx = int(rng.integers(-max_shift, max_shift + 1))
-    dy = int(rng.integers(-max_shift, max_shift + 1))
+    h, w = rotated.shape
+    rows = np.any(rotated > 0, axis=1)
+    cols = np.any(rotated > 0, axis=0)
+    if not rows.any():
+        return np.zeros_like(rotated)
+
+    y0, y1 = int(np.argmax(rows)), int(h - np.argmax(rows[::-1]))
+    x0, x1 = int(np.argmax(cols)), int(w - np.argmax(cols[::-1]))
+
+    # Allowed destination bounding box (defaults to the whole frame).
+    ry0, ry1, rx0, rx1 = region if region is not None else (0, h, 0, w)
+    # Translation range that keeps [y0,y1) x [x0,x1) inside the region.
+    dy_lo, dy_hi = ry0 - y0, ry1 - y1
+    dx_lo, dx_hi = rx0 - x0, rx1 - x1
+    if dy_lo > dy_hi or dx_lo > dx_hi:  # region smaller than shape: clamp
+        dy_lo = dy_hi = int(np.clip((ry0 + ry1 - y1 - y0) // 2,
+                                    ry0 - y0, ry1 - y1))
+        dx_lo = dx_hi = int(np.clip((rx0 + rx1 - x1 - x0) // 2,
+                                    rx0 - x0, rx1 - x1))
+    if jitter is not None:
+        jy_lo, jy_hi, jx_lo, jx_hi = jitter
+        dy_lo, dy_hi = max(dy_lo, jy_lo), min(dy_hi, jy_hi)
+        dx_lo, dx_hi = max(dx_lo, jx_lo), min(dx_hi, jx_hi)
+        if dy_lo > dy_hi:
+            dy_lo = dy_hi = 0
+        if dx_lo > dx_hi:
+            dx_lo = dx_hi = 0
+
+    dy = int(rng.integers(dy_lo, dy_hi + 1))
+    dx = int(rng.integers(dx_lo, dx_hi + 1))
 
     translated = np.zeros_like(rotated)
-    h, w = rotated.shape
-    # Source and destination slices for an integer shift by (dy, dx).
     src_y0, src_y1 = max(0, -dy), min(h, h - dy)
     src_x0, src_x1 = max(0, -dx), min(w, w - dx)
     dst_y0, dst_y1 = src_y0 + dy, src_y1 + dy
@@ -156,8 +200,22 @@ def generate_xai_tris(
             # Paper (Sec. 4.1 / App. C.1): *each* tetromino is randomly
             # translated and rotated by 90-degree increments, then combined with
             # the class-dependent sign; a global sign flip is applied as in XOR.
-            t_signal = apply_rigid_transform(signal_cache[(yi, "T")].copy(), rng)
-            l_signal = apply_rigid_transform(signal_cache[(yi, "L")].copy(), rng)
+            #
+            # The LIN scenario fixes the T-tetromino "near the top-left" and the
+            # L-tetromino "near the bottom-right"; RIGID keeps that separation and
+            # moves each shape inside its own half.  Letting both shapes roam the
+            # full frame makes them collide on ~54% of samples, and since the
+            # RIGID signal is ``aT - aL`` for y=1 the overlap cancels to zero --
+            # destroying the class signal (measured ~0.50 test accuracy, vs the
+            # paper's >0.90 at RIGID CORR alpha=0.3).  Constraining each shape to
+            # its own half reproduces the paper's learnability.
+            half = image_size // 2
+            t_region = (0, half, 0, half)          # top-left
+            l_region = (half, image_size, half, image_size)  # bottom-right
+            t_signal = apply_rigid_transform(
+                signal_cache[(yi, "T")].copy(), rng, region=t_region)
+            l_signal = apply_rigid_transform(
+                signal_cache[(yi, "L")].copy(), rng, region=l_region)
             if yi == 0:
                 base = t_signal + l_signal
             else:

@@ -699,3 +699,12 @@ pipeline:
         - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
         - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
         - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    diag_rigid_fix_validate:
+      description: Validate fixed RIGID generator reaches >90% with real torch MLP
+      notebooks:
+      - id: rigid_fix_validate
+        gpu: false
+        datasets: []
+        success_criteria:
+        - RIGID CORR alpha>=0.3 test accuracy > 90%
+        kernel_sources: []

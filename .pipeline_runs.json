@@ -138,5 +138,13 @@
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-6": {
     "notebook": "templates/rigid_evaluation/rigid_corr_sweep/rigid_corr_sweep_6.py",
     "pushed_at": "2026-10-20T10:31:05.025493"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-learnability-diag": {
+    "notebook": "notebooks/rigid_learnability_diag.py",
+    "pushed_at": "2026-10-20T20:45:23.785854"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-fix-validate": {
+    "notebook": "notebooks/rigid_fix_validate.py",
+    "pushed_at": "2026-10-20T21:54:47.112306"
   }
 }

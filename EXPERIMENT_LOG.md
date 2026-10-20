@@ -172,3 +172,56 @@ mid-range.
   `results/RESULTS_xor_first6.md` for the post-fix first-6 XOR results.
 * `N_TEST=600`; skip alpha if model test accuracy < 90%.
 * Local python: `/tmp/xai_venv/bin/python` (torch/sklearn/POT). Pipeline CLI: `.venv/bin/python`.
+
+---
+
+## 7. RIGID data-generation bug ROOT-CAUSED and fixed (2026-10-20)
+
+### Symptom (user-reported)
+1. EMD standard deviation far larger than the paper's.
+2. Laplace/Sobel clearly beat PatternLocal in RIGID CORR in our runs, while the
+   paper only claims "comparable to or worse than".
+3. RIGID CORR failed the >90% accuracy gate below alpha=0.6 (paper uses
+   alpha=0.3 qualitatively and reports >90% there).
+
+### Root cause
+`apply_rigid_transform` drew a **blind uniform shift in [-16, 16] on each axis,
+independently per tetromino**, zero-padding out of frame. But the paper's LIN
+placement puts the T-tetromino near the top-left (rows/cols 8-31) and the
+L-tetromino near the bottom-right (32-55). Consequences:
+
+* Any negative (up/left) shift pushes T off the image: shift (-16,-16) retains
+  only **128/320** pixels. ~59% of RIGID samples had a damaged signal.
+* Both shapes roaming the full frame also **collide on ~54% of samples**; since
+  the RIGID signal is `aT - aL` for y=1, the overlap **cancels to zero**.
+* Measured effect: RIGID mask px mean 845, min 264 (vs LIN's constant 1054).
+  RIGID CORR test accuracy 0.483@0.1 ... 0.61@0.3.
+
+### Fix (`src/paper_repro/data/xai_tris.py`)
+`apply_rigid_transform(signal, rng, region=..., jitter=...)` now constrains the
+translation so the whole rotated shape stays inside `region`. The RIGID branch
+passes `t_region = top-left half`, `l_region = bottom-right half`, preserving the
+paper's LIN-style separation while still rotating + translating each shape.
+
+### Verification (sklearn MLP probe, cheap/local)
+| variant | alpha=0.3 | alpha=0.5 |
+|---|---|---|
+| old (blind shift, collide) | 0.495 | 0.676 |
+| whole-frame, no collide | 0.885 | 0.980 |
+| **quadrant (shipped)** | **0.978** | **0.999** |
+
+Mask statistics after the fix: RIGID 1036 +/- 29 px (LIN/XOR 1054 +/- 0);
+zero samples below 900 px; signal contrast now 1.72-1.76, matching LIN/XOR
+(1.57-1.74). LIN and XOR outputs are bit-identical to before.
+
+### Consequence
+**All RIGID data-gen output and all RIGID sweeps are invalid and must be
+regenerated** with the fixed generator. LIN/XOR are unaffected. This also
+invalidates the earlier "RIGID CORR alpha=0.4 skip is correct protocol"
+conclusion: alpha=0.3 should now be runnable and must be re-tested.
+
+### Related note on the paper's method library
+The paper's official repo (github.com/gjoelbye/PatternLocal) ships only the
+PatternLocal *method*, not the XAI-TRIS generator (that is from Clark et al.
+[8]), so the "randomly translated" wording is genuinely underspecified. The
+quadrant reading is the one that reproduces the paper's reported accuracy.

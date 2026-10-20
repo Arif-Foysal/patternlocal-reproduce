@@ -9,18 +9,47 @@ Last updated: 2026-10-21
 
 ## 0. What is running RIGHT NOW on Kaggle
 
+State at last check (2026-10-21 01:13 +06):
+
 | Kernel | alpha | Status |
 |---|---|---|
-| `patternlocal-repro-rigid-corr-sweep-1` | 0.1 | running (CPU) |
-| `patternlocal-repro-rigid-corr-sweep-2` | 0.2 | running (CPU) |
-| `patternlocal-repro-rigid-corr-sweep-3` | 0.3 | running (CPU) |
-| `patternlocal-repro-rigid-corr-sweep-4` | 0.4 | running (CPU) |
-| `patternlocal-repro-rigid-corr-sweep-5` | 0.5 | running (CPU) |
+| `rigid-corr-sweep-1..5` | 0.1-0.5 | **running (CPU)** |
+| `rigid-white-sweep-5` | 0.5 | cancelled (no GPU quota) -> re-push on CPU |
 
-* `patternlocal-repro-rigid-white-sweep-5` (alpha=0.5) — **CANCELLED** (no GPU quota).
-  TODO: re-push on **CPU** when a slot frees. `gpu` flags in `config.yaml` are all `false`.
-* These give **valid PatternLocal-vs-LIME RIGID CORR** numbers (unaffected by the
-  filter issue below). **DO NOT CANCEL.** They answer the paper's RIGID CORR caveat.
+### Sweep queue (43 truly missing, 5 in flight)
+
+```
+have: xor-corr-sweep-1,2,9; lin-white-sweep-5; rigid-corr-sweep-6(old, INVALID);
+      rigid-white-sweep-5 (old, INVALID)
+NOTE: rigid-corr-sweep-6 and rigid-white-sweep-5 in results/ are from the OLD
+broken generator (acc 0.9535/0.9955) and are INVALID -- excluded everywhere.
+```
+
+| scenario | missing parts |
+|---|---|
+| xor-corr | 3,4,5,6,7,8 |
+| xor-white | 1..9 |
+| lin-corr | 1..9 |
+| lin-white | 1,2,3,4,6,7,8,9 |
+| rigid-corr | 1,2,3,4,5,7,8,9 (1-5 in flight) |
+| rigid-white | 1,2,3,4,5,6,7,8,9 |
+
+Push order (5 at a time as slots free):
+1. xor-corr 3,4,5,6 + rigid-white-sweep-5 (the cancelled TODO)
+2. xor-corr 7,8 + lin-corr 1,2,3
+3. lin-corr 4..8
+4. lin-white 1..4,6..9 + xor-white 1..9
+5. rigid-corr 7,8,9 + rigid-white 1..4,6..9
+
+## 0b. Decision log
+
+* 2026-10-21: filter divergence investigation CLOSED (see
+  results/FILTER_DIVERGENCE_REPORT.md final sections). Root cause: the paper's
+  data has a global EMD floor (~0.043) that ours lacks; affects ALL methods, so
+  it is a generator difference, not a filter bug. User approved: document and
+  move on, do not tune.
+* 2026-10-21: next effort = complete all six curves (user approved).
+
 
 ---
 

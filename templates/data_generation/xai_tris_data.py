@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import glob
+import zlib
 import numpy as np
 import argparse
 
@@ -75,7 +76,7 @@ def main():
             X_test, y_test = data["X_test"], data["y_test"]
             masks_test = data["masks_test"]
         else:
-            seed = hash(config_name) % (2**31)
+            seed = zlib.crc32(config_name.encode()) % (2**31)
             X, y, masks = generate_xai_tris(
                 n_samples=n_samples,
                 scenario=scenario,
@@ -84,7 +85,7 @@ def main():
                 image_size=64,
                 seed=seed,
             )
-            (X_train, y_train, _), (X_val, y_val, _), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
+            (X_train, y_train, _), (X_val, y_val, masks_val), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
             np.savez_compressed(cache_path, X_train=X_train, y_train=y_train, X_val=X_val, y_val=y_val, X_test=X_test, y_test=y_test, masks_test=masks_test)
             print(f"  Generated and cached.")
 
@@ -122,7 +123,7 @@ def main():
         }
 
         # Free memory
-        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test
+        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test, masks_val
         del model
 
     with open(os.path.join(OUTPUT_DIR, "training_summary.json"), "w") as f:

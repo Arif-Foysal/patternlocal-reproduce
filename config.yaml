@@ -1,6 +1,5 @@
 project:
   slug: patternlocal-repro
-
 kaggle:
   username: mdariffaysalnayem
   datasets:
@@ -11,463 +10,692 @@ kaggle:
     xai_tris_xor_white: mdariffaysalnayem/xai-tris-xor-white
     xai_tris_lin_white: mdariffaysalnayem/xai-tris-lin-white
     xai_tris_rigid_white: mdariffaysalnayem/xai-tris-rigid-white
-    xai_tris_results: ""
-    full_results: ""
-
+    xai_tris_results: ''
+    full_results: ''
 pipeline:
   phases:
     phase1:
-      description: "XOR suppressor toy problem (smoke test)"
+      description: XOR suppressor toy problem (smoke test)
       notebooks:
-        - id: xor_toy
-          gpu: false
-          datasets: []
-          success_criteria:
-            - "patternlocal_suppressor < 0.1 * lime_suppressor"
-
+      - id: xor_toy
+        gpu: false
+        datasets: []
+        success_criteria:
+        - patternlocal_suppressor < 0.1 * lime_suppressor
     phase2_lin_corr:
-      description: "XAI-TRIS LIN CORR data generation"
+      description: XAI-TRIS LIN CORR data generation
       notebooks:
-        - id: xai_tris_lin_corr
-          gpu: false
-          datasets: []
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_lin_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase2_lin_white:
-      description: "XAI-TRIS LIN WHITE data generation"
+      description: XAI-TRIS LIN WHITE data generation
       notebooks:
-        - id: xai_tris_scenario
-          gpu: false
-          datasets: []
-          args: ["--scenario", "LIN", "--noise", "WHITE"]
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_lin_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase2_xor_corr:
-      description: "XAI-TRIS XOR CORR data generation"
+      description: XAI-TRIS XOR CORR data generation
       notebooks:
-        - id: xai_tris_scenario
-          gpu: false
-          datasets: []
-          args: ["--scenario", "XOR", "--noise", "CORR"]
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_xor_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase2_xor_white:
-      description: "XAI-TRIS XOR WHITE data generation"
+      description: XAI-TRIS XOR WHITE data generation
       notebooks:
-        - id: xai_tris_scenario
-          gpu: false
-          datasets: []
-          args: ["--scenario", "XOR", "--noise", "WHITE"]
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_xor_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase2_rigid_corr:
-      description: "XAI-TRIS RIGID CORR data generation"
+      description: XAI-TRIS RIGID CORR data generation
       notebooks:
-        - id: xai_tris_scenario
-          gpu: false
-          datasets: []
-          args: ["--scenario", "RIGID", "--noise", "CORR"]
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_rigid_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase2_rigid_white:
-      description: "XAI-TRIS RIGID WHITE data generation"
+      description: XAI-TRIS RIGID WHITE data generation
       notebooks:
-        - id: xai_tris_rigid_white
-          gpu: true
-          datasets: []
-          success_criteria:
-            - "all 9 alphas complete"
-            - "test accuracy > 90%"
-
+      - id: xai_tris_rigid_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase3:
-      description: "Single-config evaluation (XOR CORR alpha=0.2)"
+      description: Single-config evaluation (XOR CORR alpha=0.2)
       notebooks:
-        - id: xai_tris_eval
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "patternlocal_emd < lime_emd"
-            - "patternlocal_ime < lime_ime"
-
+      - id: xai_tris_eval
+        gpu: false
+        datasets:
+        - xai_tris_xor_corr
+        success_criteria:
+        - patternlocal_emd < lime_emd
+        - patternlocal_ime < lime_ime
     phase3_analytical:
-      description: "Single-config evaluation: LIME vs PatternLocal vs Analytical PatternLocal"
+      description: 'Single-config evaluation: LIME vs PatternLocal vs Analytical PatternLocal'
       notebooks:
-        - id: xai_tris_eval_analytical
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "analytical_better_emd_vs_lime"
-            - "analytical_better_ime_vs_lime"
-
+      - id: xai_tris_eval_analytical
+        gpu: false
+        datasets:
+        - xai_tris_xor_corr
+        success_criteria:
+        - analytical_better_emd_vs_lime
+        - analytical_better_ime_vs_lime
     phase3_analytical_sg:
-      description: "Targeted evaluation: Analytical gradient vs SmoothGrad"
+      description: 'Targeted evaluation: Analytical gradient vs SmoothGrad'
       notebooks:
-        - id: xai_tris_eval_sg2
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "smoothgrad_better_emd_vs_lime"
-
+      - id: xai_tris_eval_sg2
+        gpu: false
+        datasets:
+        - xai_tris_xor_corr
+        success_criteria:
+        - smoothgrad_better_emd_vs_lime
     phase3_analytical_ig:
-      description: "Targeted evaluation: Analytical gradient vs Integrated Gradients"
+      description: 'Targeted evaluation: Analytical gradient vs Integrated Gradients'
       notebooks:
-        - id: xai_tris_eval_analytical_ig
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "ig_better_emd_vs_lime"
-
+      - id: xai_tris_eval_analytical_ig
+        gpu: false
+        datasets:
+        - xai_tris_xor_corr
+        success_criteria:
+        - ig_better_emd_vs_lime
     phase3_xor_corr_sweep_1:
-      description: "XOR CORR SNR sweep part 1: alpha = 0.1, 0.2"
+      description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
-        - id: xor_corr_sweep_1
-          gpu: true
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_corr_sweep_1
+        gpu: true
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_corr_sweep_2:
-      description: "XOR CORR SNR sweep part 2: alpha = 0.3, 0.4"
+      description: 'SNR sweep part 2: alpha = 0.2'
       notebooks:
-        - id: xor_corr_sweep_2
-          gpu: true
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_corr_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_corr_sweep_3:
-      description: "XOR CORR SNR sweep part 3: alpha = 0.5, 0.6"
+      description: 'SNR sweep part 3: alpha = 0.3'
       notebooks:
-        - id: xor_corr_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_corr_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_corr_sweep_4:
-      description: "XOR CORR SNR sweep part 4: alpha = 0.7, 0.8"
+      description: 'SNR sweep part 4: alpha = 0.4'
       notebooks:
-        - id: xor_corr_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_corr_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_corr_sweep_5:
-      description: "XOR CORR SNR sweep part 5: alpha = 0.9"
+      description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
-        - id: xor_corr_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
-    phase3_xor_corr_ab_1:
-      description: "XOR CORR SNR sweep part 1 (additional baselines): alpha = 0.1, 0.2, 0.3"
+      - id: xor_corr_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
+    phase3_xor_corr_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
       notebooks:
-        - id: xor_corr_ab_1
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 3 alphas complete for 7 methods"
-
-    phase3_lin_corr_sweep_1:
-      description: "LIN CORR SNR sweep part 1: alpha = 0.1, 0.2"
+      - id: xor_corr_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
+    phase3_xor_corr_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
       notebooks:
-        - id: lin_corr_sweep_1
-          gpu: false
-          datasets:
-            - xai_tris_lin_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_lin_corr_sweep_2:
-      description: "LIN CORR SNR sweep part 2: alpha = 0.3, 0.4"
+      - id: xor_corr_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
+    phase3_xor_corr_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
       notebooks:
-        - id: lin_corr_sweep_2
-          gpu: false
-          datasets:
-            - xai_tris_lin_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_lin_corr_sweep_3:
-      description: "LIN CORR SNR sweep part 3: alpha = 0.5, 0.6"
+      - id: xor_corr_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
+    phase3_xor_corr_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
       notebooks:
-        - id: lin_corr_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_lin_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_lin_corr_sweep_4:
-      description: "LIN CORR SNR sweep part 4: alpha = 0.7, 0.8"
-      notebooks:
-        - id: lin_corr_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_lin_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_lin_corr_sweep_5:
-      description: "LIN CORR SNR sweep part 5: alpha = 0.9"
-      notebooks:
-        - id: lin_corr_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_lin_corr
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
+      - id: xor_corr_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_white_sweep_1:
-      description: "XOR WHITE SNR sweep part 1: alpha = 0.1, 0.2"
+      description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
-        - id: xor_white_sweep_1
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_white_sweep_1
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
     phase3_xor_white_sweep_2:
-      description: "XOR WHITE SNR sweep part 2: alpha = 0.3, 0.4"
+      description: 'SNR sweep part 2: alpha = 0.2'
       notebooks:
-        - id: xor_white_sweep_2
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_white_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
     phase3_xor_white_sweep_3:
-      description: "XOR WHITE SNR sweep part 3: alpha = 0.5, 0.6"
+      description: 'SNR sweep part 3: alpha = 0.3'
       notebooks:
-        - id: xor_white_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_white_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
     phase3_xor_white_sweep_4:
-      description: "XOR WHITE SNR sweep part 4: alpha = 0.7, 0.8"
+      description: 'SNR sweep part 4: alpha = 0.4'
       notebooks:
-        - id: xor_white_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: xor_white_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
     phase3_xor_white_sweep_5:
-      description: "XOR WHITE SNR sweep part 5: alpha = 0.9"
+      description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
-        - id: xor_white_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
-    phase3_rigid_corr_sweep_1:
-      description: "RIGID CORR SNR sweep part 1: alpha = 0.1, 0.2"
+      - id: xor_white_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+    phase3_xor_white_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
       notebooks:
-        - id: rigid_corr_sweep_1
-          gpu: false
-          datasets:
-            - xai_tris_rigid_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_corr_sweep_2:
-      description: "RIGID CORR SNR sweep part 2: alpha = 0.3, 0.4"
+      - id: xor_white_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+    phase3_xor_white_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
       notebooks:
-        - id: rigid_corr_sweep_2
-          gpu: false
-          datasets:
-            - xai_tris_rigid_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_corr_sweep_3:
-      description: "RIGID CORR SNR sweep part 3: alpha = 0.5, 0.6"
+      - id: xor_white_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+    phase3_xor_white_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
       notebooks:
-        - id: rigid_corr_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_rigid_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_corr_sweep_4:
-      description: "RIGID CORR SNR sweep part 4: alpha = 0.7, 0.8"
+      - id: xor_white_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+    phase3_xor_white_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
       notebooks:
-        - id: rigid_corr_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_rigid_corr
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_corr_sweep_5:
-      description: "RIGID CORR SNR sweep part 5: alpha = 0.9"
+      - id: xor_white_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+    phase3_lin_corr_sweep_1:
+      description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
-        - id: rigid_corr_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_rigid_corr
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
-    phase3_rigid_white_sweep_1:
-      description: "RIGID WHITE SNR sweep part 1: alpha = 0.1, 0.2"
+      - id: lin_corr_sweep_1
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_2:
+      description: 'SNR sweep part 2: alpha = 0.2'
       notebooks:
-        - id: rigid_white_sweep_1
-          gpu: false
-          datasets:
-            - xai_tris_rigid_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_white_sweep_2:
-      description: "RIGID WHITE SNR sweep part 2: alpha = 0.3, 0.4"
+      - id: lin_corr_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_3:
+      description: 'SNR sweep part 3: alpha = 0.3'
       notebooks:
-        - id: rigid_white_sweep_2
-          gpu: false
-          datasets:
-            - xai_tris_rigid_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_white_sweep_3:
-      description: "RIGID WHITE SNR sweep part 3: alpha = 0.5, 0.6"
+      - id: lin_corr_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_4:
+      description: 'SNR sweep part 4: alpha = 0.4'
       notebooks:
-        - id: rigid_white_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_rigid_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_white_sweep_4:
-      description: "RIGID WHITE SNR sweep part 4: alpha = 0.7, 0.8"
+      - id: lin_corr_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_5:
+      description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
-        - id: rigid_white_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_rigid_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
-    phase3_rigid_white_sweep_5:
-      description: "RIGID WHITE SNR sweep part 5: alpha = 0.9"
+      - id: lin_corr_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
       notebooks:
-        - id: rigid_white_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_rigid_white
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
+      - id: lin_corr_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
+      notebooks:
+      - id: lin_corr_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
+      notebooks:
+      - id: lin_corr_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+    phase3_lin_corr_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
+      notebooks:
+      - id: lin_corr_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
     phase3_lin_white_sweep_1:
-      description: "LIN WHITE SNR sweep part 1: alpha = 0.1, 0.2"
+      description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
-        - id: lin_white_sweep_1
-          gpu: false
-          datasets:
-            - xai_tris_lin_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: lin_white_sweep_1
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
     phase3_lin_white_sweep_2:
-      description: "LIN WHITE SNR sweep part 2: alpha = 0.3, 0.4"
+      description: 'SNR sweep part 2: alpha = 0.2'
       notebooks:
-        - id: lin_white_sweep_2
-          gpu: false
-          datasets:
-            - xai_tris_lin_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: lin_white_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
     phase3_lin_white_sweep_3:
-      description: "LIN WHITE SNR sweep part 3: alpha = 0.5, 0.6"
+      description: 'SNR sweep part 3: alpha = 0.3'
       notebooks:
-        - id: lin_white_sweep_3
-          gpu: false
-          datasets:
-            - xai_tris_lin_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: lin_white_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
     phase3_lin_white_sweep_4:
-      description: "LIN WHITE SNR sweep part 4: alpha = 0.7, 0.8"
+      description: 'SNR sweep part 4: alpha = 0.4'
       notebooks:
-        - id: lin_white_sweep_4
-          gpu: false
-          datasets:
-            - xai_tris_lin_white
-          success_criteria:
-            - "all 2 alphas complete for 7 methods"
-
+      - id: lin_white_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
     phase3_lin_white_sweep_5:
-      description: "LIN WHITE SNR sweep part 5: alpha = 0.9"
+      description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
-        - id: lin_white_sweep_5
-          gpu: false
-          datasets:
-            - xai_tris_lin_white
-          success_criteria:
-            - "all 1 alpha complete for 7 methods"
-
+      - id: lin_white_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+    phase3_lin_white_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
+      notebooks:
+      - id: lin_white_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+    phase3_lin_white_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
+      notebooks:
+      - id: lin_white_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+    phase3_lin_white_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
+      notebooks:
+      - id: lin_white_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+    phase3_lin_white_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
+      notebooks:
+      - id: lin_white_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+    phase3_rigid_corr_sweep_1:
+      description: 'SNR sweep part 1: alpha = 0.1'
+      notebooks:
+      - id: rigid_corr_sweep_1
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_2:
+      description: 'SNR sweep part 2: alpha = 0.2'
+      notebooks:
+      - id: rigid_corr_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_3:
+      description: 'SNR sweep part 3: alpha = 0.3'
+      notebooks:
+      - id: rigid_corr_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_4:
+      description: 'SNR sweep part 4: alpha = 0.4'
+      notebooks:
+      - id: rigid_corr_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_5:
+      description: 'SNR sweep part 5: alpha = 0.5'
+      notebooks:
+      - id: rigid_corr_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
+      notebooks:
+      - id: rigid_corr_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
+      notebooks:
+      - id: rigid_corr_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
+      notebooks:
+      - id: rigid_corr_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_corr_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
+      notebooks:
+      - id: rigid_corr_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    phase3_rigid_white_sweep_1:
+      description: 'SNR sweep part 1: alpha = 0.1'
+      notebooks:
+      - id: rigid_white_sweep_1
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_2:
+      description: 'SNR sweep part 2: alpha = 0.2'
+      notebooks:
+      - id: rigid_white_sweep_2
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_3:
+      description: 'SNR sweep part 3: alpha = 0.3'
+      notebooks:
+      - id: rigid_white_sweep_3
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_4:
+      description: 'SNR sweep part 4: alpha = 0.4'
+      notebooks:
+      - id: rigid_white_sweep_4
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_5:
+      description: 'SNR sweep part 5: alpha = 0.5'
+      notebooks:
+      - id: rigid_white_sweep_5
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_6:
+      description: 'SNR sweep part 6: alpha = 0.6'
+      notebooks:
+      - id: rigid_white_sweep_6
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_7:
+      description: 'SNR sweep part 7: alpha = 0.7'
+      notebooks:
+      - id: rigid_white_sweep_7
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_8:
+      description: 'SNR sweep part 8: alpha = 0.8'
+      notebooks:
+      - id: rigid_white_sweep_8
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_rigid_white_sweep_9:
+      description: 'SNR sweep part 9: alpha = 0.9'
+      notebooks:
+      - id: rigid_white_sweep_9
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 1 alpha complete for 13 methods
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
+    phase3_xor_corr_ab_1:
+      description: 'XOR CORR SNR sweep part 1 (additional baselines): alpha = 0.1, 0.2, 0.3'
+      notebooks:
+      - id: xor_corr_ab_1
+        gpu: false
+        datasets:
+        - xai_tris_xor_corr
+        success_criteria:
+        - all 3 alphas complete for 7 methods
     phase3_xor_corr_qualitative_lasso:
-      description: "XOR CORR Qualitative XAI with L1 Lasso (alpha = 0.1 - 0.9)"
+      description: XOR CORR Qualitative XAI with L1 Lasso (alpha = 0.1 - 0.9)
       notebooks:
-        - id: xor_corr_qualitative_lasso
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 9 alphas complete with 5 samples each"
-
+      - id: xor_corr_qualitative_lasso
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete with 5 samples each
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
     phase3_xor_white_qualitative_ridge:
-      description: "XOR WHITE Qualitative XAI with Ridge (alpha = 0.1 - 0.4)"
+      description: XOR WHITE Qualitative XAI with Ridge (alpha = 0.1 - 0.4)
       notebooks:
-        - id: xor_white_qualitative_ridge
-          gpu: false
-          datasets:
-            - xai_tris_xor_white
-          success_criteria:
-            - "all 4 alphas complete with 5 samples each"
-
+      - id: xor_white_qualitative_ridge
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 4 alphas complete with 5 samples each
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
     phase4:
-      description: "Full Figure 4 reproduction (54 configs, 200 TPE trials)"
+      description: Full Figure 4 reproduction (54 configs, 200 TPE trials)
       notebooks:
-        - id: full_repro
-          gpu: false
-          datasets:
-            - xai_tris_xor_corr
-          success_criteria:
-            - "all 54 configs complete"
-            - "patternlocal outperforms LIME in XOR and RIGID"
+      - id: full_repro
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 54 configs complete
+        - patternlocal outperforms LIME in XOR and RIGID
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white

@@ -48,21 +48,45 @@ def make_tetromino(name, size=64):
 
 
 def smooth_signal(signal, sigma=1.5, threshold=0.05):
-    """Apply Gaussian smoothing with threshold."""
+    """Apply Gaussian smoothing with a relative maximum-support threshold.
+
+    The paper (App. C.1) uses a Gaussian filter with ``sigma_smooth = 1.5`` and
+    a *maximum support threshold of 5%*: coefficients whose magnitude falls
+    below 5% of the largest coefficient are discarded.  The threshold must be
+    relative and sign-preserving -- an absolute ``smoothed < 0.05`` test would
+    erase every negative lobe, which destroys the ``-aL`` component of XOR and
+    RIGID signals.
+    """
     smoothed = gaussian_filter(signal, sigma=sigma)
-    smoothed[smoothed < threshold] = 0.0
+    peak = float(np.max(np.abs(smoothed)))
+    if peak > 0:
+        smoothed[np.abs(smoothed) < threshold * peak] = 0.0
     return smoothed
 
 
 def apply_rigid_transform(signal, rng):
-    """Apply random 90-degree rotation and translation."""
+    """Apply random 90-degree rotation and translation (zero-padded, no wrap).
+
+    The paper applies R(n) as a rigid-body transformation: rotation in 90-degree
+    increments followed by a translation.  ``np.roll`` would wrap foreground
+    pixels around the image border, which is not a rigid transform of the image
+    content, so we shift with zero filling instead.
+    """
     k = rng.integers(0, 4)
     rotated = np.rot90(signal, k)
 
     max_shift = signal.shape[0] // 4
-    dx = rng.integers(-max_shift, max_shift + 1)
-    dy = rng.integers(-max_shift, max_shift + 1)
-    translated = np.roll(rotated, shift=(dy, dx), axis=(0, 1))
+    dx = int(rng.integers(-max_shift, max_shift + 1))
+    dy = int(rng.integers(-max_shift, max_shift + 1))
+
+    translated = np.zeros_like(rotated)
+    h, w = rotated.shape
+    # Source and destination slices for an integer shift by (dy, dx).
+    src_y0, src_y1 = max(0, -dy), min(h, h - dy)
+    src_x0, src_x1 = max(0, -dx), min(w, w - dx)
+    dst_y0, dst_y1 = src_y0 + dy, src_y1 + dy
+    dst_x0, dst_x1 = src_x0 + dx, src_x1 + dx
+    translated[dst_y0:dst_y1, dst_x0:dst_x1] = rotated[src_y0:src_y1, src_x0:src_x1]
     return translated
 
 
@@ -116,20 +140,31 @@ def generate_xai_tris(
             t_signal = signal_cache[(yi, "T")].copy()
             l_signal = signal_cache[(yi, "L")].copy()
             if yi == 0:
-                signal = t_signal + l_signal
+                base = t_signal + l_signal
             else:
-                signal = t_signal - l_signal
-            smoothed = smooth_signal(signal)
+                base = t_signal - l_signal
+            # Paper (App. C.1): each class also contains the global sign-flipped
+            # variant, so the label is determined by the *relative* sign of the
+            # two tetrominoes (a true XOR), not by one tetromino's absolute sign.
+            #   y=0: aXOR++ = aT + aL   or   aXOR-- = -aT - aL
+            #   y=1: aXOR+- = aT - aL   or   aXOR-+ = -aT + aL
+            if rng.random() < 0.5:
+                base = -base
+            smoothed = smooth_signal(base)
 
         elif scenario == "RIGID":
-            t_signal = signal_cache[(yi, "T")].copy()
-            l_signal = signal_cache[(yi, "L")].copy()
+            # Paper (Sec. 4.1 / App. C.1): *each* tetromino is randomly
+            # translated and rotated by 90-degree increments, then combined with
+            # the class-dependent sign; a global sign flip is applied as in XOR.
+            t_signal = apply_rigid_transform(signal_cache[(yi, "T")].copy(), rng)
+            l_signal = apply_rigid_transform(signal_cache[(yi, "L")].copy(), rng)
             if yi == 0:
-                signal = t_signal + l_signal
+                base = t_signal + l_signal
             else:
-                signal = t_signal - l_signal
-            rigid = apply_rigid_transform(signal, rng)
-            smoothed = smooth_signal(rigid)
+                base = t_signal - l_signal
+            if rng.random() < 0.5:
+                base = -base
+            smoothed = smooth_signal(base)
 
         else:
             raise ValueError(f"Unknown scenario: {scenario}")

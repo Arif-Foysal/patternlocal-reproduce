@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""LIN WHITE SNR sweep part 3: alpha = 0.5, 0.6.
+"""LIN WHITE SNR sweep part 3: alpha = 0.3.
 
 Compares LIME, PatternLocal, Analytical-gradient, Analytical-IG (proposed),
 plus plain baselines (no KNN): Plain Gradient, Plain Integrated Gradients,
-Plain SmoothGrad.
+Plain SmoothGrad, and the paper baseline set (Saliency, DeepLift, GradientShap,
+GuidedBackprop, Sobel, Laplace).
 
 Skips any alpha whose model test accuracy < 90%.
 Uses shared core in src/paper_repro/xai/eval_common.py.
@@ -21,19 +22,20 @@ for root, dirs, files in os.walk("/kaggle/input"):
 
 from xai.eval_common import evaluate_alpha, find_file, format_result, save_results
 
-ALPHAS = [0.5, 0.6]
+ALPHAS = [0.3]
 N_TEST = 600
 MIN_ACCURACY = 0.90
 
 METHODS = ["lime", "patternlocal", "analytical_grad",
            "analytical_ig", "plain_grad", "plain_ig",
-           "plain_smoothgrad"]
+           "plain_smoothgrad", "saliency", "deeplift",
+           "gradient_shap", "guided_backprop", "sobel", "laplace"]
 
 
 def main():
     t_start = time.time()
     print("=" * 60)
-    print("LIN WHITE SNR sweep part 3: alpha = 0.5, 0.6")
+    print("LIN WHITE SNR sweep part 3: alpha = 0.3")
     print("=" * 60)
 
     all_results = {}

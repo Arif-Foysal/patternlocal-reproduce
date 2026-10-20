@@ -10,6 +10,7 @@ where C = Cov_Pi[x, x] is the local covariance matrix.
 
 import numpy as np
 from scipy.spatial.distance import cdist
+from sklearn.metrics.pairwise import euclidean_distances
 from sklearn.linear_model import Lasso, ElasticNet
 
 
@@ -58,14 +59,22 @@ def patternlocal_explain(
         pattern_weights: PatternLocal explanation (D,)
     """
     n_total, d = X_train.shape
+    X_f32 = X_train if X_train.dtype == np.float32 else np.asarray(X_train, dtype=np.float32)
+
+    # Kernel weights in *training-data row order* (zeros outside the local set),
+    # so no gather/copy of the N x D matrix is needed for any k_ratio.
+    w_full = np.zeros(n_total, dtype=np.float64)
 
     if use_global_cov:
         # Global covariance: uniform weights over all training data
-        X_local = X_train
-        weights = np.ones(n_total) / n_total
+        w_full[:] = 1.0 / n_total
+        bandwidth = np.inf  # informational; weights are uniform
     else:
         k = max(1, int(k_ratio * n_total))
-        distances = cdist(X_train, instance.reshape(1, -1), metric="euclidean").ravel()
+        # BLAS-backed (float32, no copy of X_train) — ~2x faster than cdist;
+        # squared-distance cancellation error ~1e-7 at unit-norm scale.
+        instance_2d = np.asarray(instance, dtype=np.float32).reshape(1, -1)
+        distances = euclidean_distances(X_f32, instance_2d).ravel()
         sorted_idx = np.argsort(distances)
         k_idx = sorted_idx[:k]
         distances_k = distances[k_idx]
@@ -79,32 +88,38 @@ def patternlocal_explain(
         weight_sum = np.sum(weights)
         if weight_sum == 0:
             raise ValueError("Kernel weights sum to zero. Increase k or adjust bandwidth.")
-        weights /= weight_sum
+        w_full[k_idx] = weights / weight_sum
 
-        X_local = X_train[k_idx]
-
-    weighted_mean = np.average(X_local, weights=weights, axis=0)
-    diffs = X_local - weighted_mean
-
-    # Local/global covariance matrix: C = sum_i w_i * diffs_i * diffs_i^T
-    # Vectorized (weighted_diffs.T @ diffs) — equivalent to a loop of
-    # np.outer calls but ~100x faster and avoids 500x134MB allocations.
-    weighted_diffs = weights[:, None] * diffs
-    C = weighted_diffs.T @ diffs
+    # --- a = C w / (w^T C w + lambda)  WITHOUT forming C ---------------------
+    # C = sum_i v_i (x_i - mu)(x_i - mu)^T  with mu = sum_i v_i x_i, so
+    #   t_i   = (x_i - mu) . w
+    #   Cw    = sum_i v_i t_i x_i      (because sum_i v_i t_i = 0)
+    # Three BLAS gemvs over N x D instead of an O(N D^2) matmul: ~4000x cheaper
+    # and it never allocates an N x D temporary (1.3 GB at N=40k, D=4096).
+    v = w_full.astype(np.float32)
+    w = np.asarray(lime_weights, dtype=np.float32).ravel()
+    mu = v @ X_f32                                     # (D,)
+    t = (X_f32 @ w) - float(mu @ w)                    # (N,)
+    q = v * t
+    Cw = q @ X_f32                                     # (D,)
+    var_y = float(w @ Cw)                              # w^T C w
 
     if shrinkage and shrinkage > 0:
-        avg_variance = float(np.mean(np.diag(C)))
-        C = (1.0 - shrinkage) * C + shrinkage * (avg_variance * np.eye(d))
+        # avg_variance = mean_j diag(C)_j ; diag(C) = sum_i v_i x_ij^2 - mu_j^2
+        acc = np.zeros(d, dtype=np.float64)
+        block = 4096
+        for start in range(0, n_total, block):
+            blk = X_f32[start:start + block].astype(np.float64)
+            acc += w_full[start:start + block] @ (blk * blk)
+        avg_variance = float(np.mean(acc - mu.astype(np.float64) ** 2))
+        Cw = (1.0 - shrinkage) * Cw + shrinkage * avg_variance * w
+        var_y = float(w @ Cw)
 
-    # PatternLocal weights: a = C * w / (w^T * C * w + lambda)
-    Cw = C @ lime_weights
-    wTCw = lime_weights @ Cw
-    var_y = wTCw + lam
-
+    var_y = var_y + lam
     if var_y <= 1e-15:
         return np.zeros(d)
 
-    pattern_weights = Cw / var_y
+    pattern_weights = Cw.astype(np.float64) / var_y
 
     return pattern_weights
 

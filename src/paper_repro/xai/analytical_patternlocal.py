@@ -157,23 +157,35 @@ class AnalyticalPatternLocalExplainer:
         return bw if bw > 0 else np.finfo(float).eps
 
     def _attribution(self, w_grad, X_K, weights):
-        """a = C_K w = X~^T (w * (X~ w)) / sum(w), X~ centred neighbourhood."""
+        """a = C_K w  (kernel-weighted local covariance times w_grad).
+
+        Centre-free form: with mu = sum_i v_i x_i and t_i = (x_i - mu) . w,
+        sum_i v_i t_i = 0, so C w = sum_i v_i t_i x_i — three BLAS gemvs and
+        no N x D temporary (the old X - mu / v[:, None] * X form allocated two
+        N x D copies, 2.6 GB at N=40k, D=4096, and upcast to float64).
+        """
         weights = np.asarray(weights, dtype=np.float64)
         w_sum = weights.sum()
         if w_sum <= 0:
             raise ValueError("Kernel weights sum to zero. Increase k or bandwidth.")
-        weights = weights / w_sum
+        v = (weights / w_sum).astype(np.float32)
 
-        local_mean = (weights[:, None] * X_K).sum(axis=0)
-        X_tilde = X_K - local_mean
-        v = X_tilde @ w_grad
-        a = X_tilde.T @ (weights * v)
+        a = self._cov_transform(w_grad, X_K, v)
 
         if self.normalize:
             max_abs = float(np.max(np.abs(a)))
             if max_abs > 0:
                 a = a / max_abs
         return a
+
+    def _cov_transform(self, w_grad, X, v):
+        """a = X^T (v * (X - mu).w) with mu = v @ X, v normalised, X row order."""
+        X32 = X if X.dtype == np.float32 else np.asarray(X, dtype=np.float32)
+        v32 = np.asarray(v, dtype=np.float32)
+        w = np.asarray(w_grad, dtype=np.float32).ravel()
+        mu = v32 @ X32                                   # (D,)
+        t = (X32 @ w) - float(mu @ w)                    # (N,)
+        return (v32 * t) @ X32                           # (D,)
 
     def analytical_attr_lasso(self, x_star, grad_vector, dists, idx_nn, k,
                                alpha=0.01):

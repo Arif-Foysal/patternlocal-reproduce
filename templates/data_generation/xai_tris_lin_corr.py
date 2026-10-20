@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import glob
+import zlib
 import shutil
 import numpy as np
 
@@ -40,6 +41,15 @@ def main():
 
     os.makedirs(OUTPUT_DIR, exist_ok=True)
 
+    # Source fingerprint (verify the correct core-dataset version is mounted).
+    import hashlib
+    src_candidates = glob.glob("/kaggle/input/**/data/xai_tris.py", recursive=True)
+    if src_candidates:
+        src_path = src_candidates[0]
+        digest = hashlib.md5(open(src_path, "rb").read()).hexdigest()
+        print(f"Source: {src_path}")
+        print(f"Source fingerprint: {digest}")
+
     scenario = "LIN"
     noise = "CORR"
     alphas = [round(0.1 * i, 1) for i in range(1, 10)]
@@ -62,7 +72,7 @@ def main():
             X_test, y_test = data["X_test"], data["y_test"]
             masks_test = data["masks_test"]
         else:
-            seed = hash(config_name) % (2**31)
+            seed = zlib.crc32(config_name.encode()) % (2**31)
             X, y, masks = generate_xai_tris(
                 n_samples=n_samples,
                 scenario=scenario,
@@ -71,7 +81,7 @@ def main():
                 image_size=64,
                 seed=seed,
             )
-            (X_train, y_train, _), (X_val, y_val, _), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
+            (X_train, y_train, _), (X_val, y_val, masks_val), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
             
             # Save as float32 to reduce disk usage
             np.savez_compressed(cache_path,
@@ -82,6 +92,7 @@ def main():
                 X_test=X_test.astype(np.float32),
                 y_test=y_test.astype(np.int64),
                 masks_test=masks_test.astype(np.float32),
+                masks_val=masks_val.astype(np.float32),
             )
             print(f"  Generated and cached.")
             clear_temp()
@@ -89,6 +100,7 @@ def main():
         class_balance = float(np.mean(y_test))
         print(f"  Shapes: train={X_train.shape}, val={X_val.shape}, test={X_test.shape}")
         print(f"  Class balance (test): {class_balance:.3f}")
+        print(f"  Mask pixels (test mean): {float(masks_test.sum(axis=1).mean()):.1f}")
 
         model_cache = os.path.join(OUTPUT_DIR, f"{config_name}_model.pt")
         if os.path.exists(model_cache):
@@ -120,7 +132,7 @@ def main():
         }
 
         # Free memory
-        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test
+        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test, masks_val
         del model
 
     summary_path = os.path.join(OUTPUT_DIR, f"training_summary_{scenario}_{noise}.json")

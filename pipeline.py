@@ -236,6 +236,14 @@ def cmd_push(config, notebook_path):
         if datasets_map[ds_key]:
             datasets.append(datasets_map[ds_key])
 
+    # Kernel sources: mount another notebook's output directly under
+    # /kaggle/input/<kernel-slug>/. This lets data-generation kernels feed the
+    # sweeps without publishing a 5.5 GB dataset from a local machine.
+    kernel_sources = []
+    for src in nb_cfg.get("kernel_sources", []) or []:
+        kernel_sources.append(src if "/" in src else
+                              f"{config['kaggle']['username']}/{src}")
+
     push_dir = PIPELINE_DIR / "_kaggle_push"
     push_dir.mkdir(exist_ok=True)
     shutil.copy2(nb_path, push_dir / nb_path.name)
@@ -251,7 +259,7 @@ def cmd_push(config, notebook_path):
         "enable_internet": "true",
         "dataset_sources": datasets,
         "competition_sources": [],
-        "kernel_sources": [],
+        "kernel_sources": kernel_sources,
     }
     with open(push_dir / "kernel-metadata.json", "w") as f:
         json.dump(metadata, f, indent=2)

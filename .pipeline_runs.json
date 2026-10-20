@@ -9,19 +9,19 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-lin-corr": {
     "notebook": "templates/data_generation/xai_tris_lin_corr.py",
-    "pushed_at": "2026-10-17T04:02:25.259978"
+    "pushed_at": "2026-10-19T22:14:11.375546"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-xor-corr": {
-    "notebook": "templates/xai_tris_xor_corr.py",
-    "pushed_at": "2026-10-16T00:24:33.479411"
+    "notebook": "templates/data_generation/xai_tris_xor_corr.py",
+    "pushed_at": "2026-10-19T22:13:55.422306"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-lin-white": {
     "notebook": "templates/data_generation/xai_tris_lin_white.py",
-    "pushed_at": "2026-10-17T03:35:20.463119"
+    "pushed_at": "2026-10-19T22:14:19.039733"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-xor-white": {
     "notebook": "templates/data_generation/xai_tris_xor_white.py",
-    "pushed_at": "2026-10-17T02:44:38.182577"
+    "pushed_at": "2026-10-19T22:14:02.964579"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-eval": {
     "notebook": "templates/xai_tris_eval.py",
@@ -45,11 +45,11 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-1": {
     "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_1.py",
-    "pushed_at": "2026-10-17T08:45:06.698873"
+    "pushed_at": "2026-10-20T10:37:18.687213"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-2": {
     "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_2.py",
-    "pushed_at": "2026-10-17T08:46:10.109754"
+    "pushed_at": "2026-10-20T10:29:08.501045"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-3": {
     "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_3.py",
@@ -77,23 +77,23 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr": {
     "notebook": "templates/data_generation/xai_tris_rigid_corr.py",
-    "pushed_at": "2026-10-17T01:48:18.904223"
+    "pushed_at": "2026-10-19T22:14:28.155135"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white": {
     "notebook": "templates/data_generation/xai_tris_rigid_white.py",
-    "pushed_at": "2026-10-17T03:35:38.855718"
+    "pushed_at": "2026-10-19T23:04:32.853107"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-1": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_1.py",
-    "pushed_at": "2026-10-17T08:51:48.066778"
+    "pushed_at": "2026-10-19T23:09:36.387462"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-2": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_2.py",
-    "pushed_at": "2026-10-17T08:52:12.716639"
+    "pushed_at": "2026-10-19T23:10:04.964561"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-3": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_3.py",
-    "pushed_at": "2026-10-17T23:21:52.308992"
+    "pushed_at": "2026-10-19T23:10:33.740139"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-4": {
     "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_4.py",
@@ -101,7 +101,7 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-5": {
     "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_5.py",
-    "pushed_at": "2026-10-17T08:47:03.769964"
+    "pushed_at": "2026-10-20T00:28:02.689306"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-qualitative-lasso": {
     "notebook": "templates/xor_evaluation/xor_corr_qualitative_lasso/xor_corr_qualitative_lasso.py",
@@ -109,14 +109,34 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-4": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_4.py",
-    "pushed_at": "2026-10-17T23:22:19.144479"
+    "pushed_at": "2026-10-19T23:11:02.663360"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-5": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_5.py",
-    "pushed_at": "2026-10-17T23:22:43.117340"
+    "pushed_at": "2026-10-19T23:11:31.083241"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-qualitative-ridge": {
     "notebook": "templates/xor_evaluation/xor_white_qualitative_ridge/xor_white_qualitative_ridge.py",
     "pushed_at": "2026-10-18T13:04:37.833928"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-9": {
+    "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_9.py",
+    "pushed_at": "2026-10-20T10:29:13.828999"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-5": {
+    "notebook": "templates/rigid_evaluation/rigid_white_sweep/rigid_white_sweep_5.py",
+    "pushed_at": "2026-10-20T10:29:18.943910"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-4": {
+    "notebook": "templates/rigid_evaluation/rigid_corr_sweep/rigid_corr_sweep_4.py",
+    "pushed_at": "2026-10-20T10:29:23.856580"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-5": {
+    "notebook": "templates/lin_evaluation/lin_white_sweep/lin_white_sweep_5.py",
+    "pushed_at": "2026-10-20T10:29:29.592669"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-6": {
+    "notebook": "templates/rigid_evaluation/rigid_corr_sweep/rigid_corr_sweep_6.py",
+    "pushed_at": "2026-10-20T10:31:05.025493"
   }
 }

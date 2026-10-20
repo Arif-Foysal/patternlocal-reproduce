@@ -3,6 +3,7 @@ import sys
 import os
 import json
 import glob
+import zlib
 import shutil
 import argparse
 import numpy as np
@@ -74,7 +75,7 @@ def main():
             X_test, y_test = data["X_test"], data["y_test"]
             masks_test = data["masks_test"]
         else:
-            seed = hash(config_name) % (2**31)
+            seed = zlib.crc32(config_name.encode()) % (2**31)
             X, y, masks = generate_xai_tris(
                 n_samples=n_samples,
                 scenario=args.scenario,
@@ -83,7 +84,7 @@ def main():
                 image_size=64,
                 seed=seed,
             )
-            (X_train, y_train, _), (X_val, y_val, _), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
+            (X_train, y_train, _), (X_val, y_val, masks_val), (X_test, y_test, masks_test) = split_dataset(X, y, masks, seed=seed)
             
             # Save as float32 to reduce disk usage
             np.savez_compressed(cache_path,
@@ -94,6 +95,7 @@ def main():
                 X_test=X_test.astype(np.float32),
                 y_test=y_test.astype(np.int64),
                 masks_test=masks_test.astype(np.float32),
+                masks_val=masks_val.astype(np.float32),
             )
             print(f"  Generated and cached.")
             clear_temp()
@@ -132,7 +134,7 @@ def main():
         }
 
         # Free memory
-        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test
+        del X_train, y_train, X_val, y_val, X_test, y_test, masks_test, masks_val
         del model
 
     summary_path = os.path.join(OUTPUT_DIR, f"training_summary_{args.scenario}_{args.noise}.json")

@@ -332,3 +332,13 @@ a (favourable) difference from the paper worth stating explicitly.
 
 All RIGID CORR/WHITE sweep templates auto-skip any alpha with test accuracy
 < 90%; with the fix none should skip.
+
+### GPU quota unavailable -- TODO
+`rigid-white-sweep-5` (alpha=0.5) was pushed with `gpu: true` but **canceled by
+the user: no GPU quota**. It is currently `cancel_acknowledged`.
+
+**TODO: re-push `rigid-white-sweep-5` on CPU** once a CPU slot frees up, after
+flipping `gpu: false` back for `phase3_rigid_white_sweep_5` in `config.yaml`.
+The GPU flag was ONLY ever set for this phase because it was the 6th slot; there
+is no reason it needs a GPU.
+

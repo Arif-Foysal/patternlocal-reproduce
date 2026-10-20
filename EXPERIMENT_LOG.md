@@ -255,3 +255,46 @@ competitive on CORR — which is the paper's actual claim (they benefit from the
 smooth correlated noise aligning with smooth signal edges; IME ~0.3 shows 30%
 of their mass still lands outside the mask). The earlier "Laplace wins
 everywhere" impression was inflated by the RIGID generator bug.
+
+---
+
+## 8. Paper Figure 4 numeric targets (extracted from PDF text layer)
+
+The PDF text layer contains the plotted y-axis tick labels, which give the
+paper's actual axis ranges. These are the reproduction targets.
+
+### EMD (panel 4a)
+| panel | alpha plotted | y-ticks |
+|---|---|---|
+| LIN WHITE | 0.1-0.9 | 0.23, 0.25, 0.27, 0.30 |
+| LIN CORR  | 0.1-0.9 | 0.22, 0.25, 0.27, 0.29 |
+| XOR WHITE | **0.2-0.9** (0.1 skipped) | 0.01, 0.07, 0.13, 0.19 |
+| XOR CORR  | 0.1-0.9 | 0.03, 0.07, 0.11, 0.15 |
+| RIGID WHITE | **0.5-0.9** (0.1-0.4 skipped) | 0.06, 0.14, 0.23, 0.31 |
+| RIGID CORR  | 0.1-0.9 | 0.05, 0.13, 0.21, 0.30 |
+
+### IME (panel 4b)
+| panel | y-ticks |
+|---|---|
+| LIN WHITE | 0.25, 0.34, 0.70 |
+| LIN CORR  | 0.30, 0.36, 0.42, 0.48 |
+| XOR WHITE | 0.04, 0.37, 0.78 |
+| XOR CORR  | 0.10, 0.38, 0.66, 0.94 |
+| RIGID WHITE | 0.45, 0.61, 0.78 |
+| RIGID CORR  | 0.27, 0.49, 0.72, 0.94 |
+
+### Key protocol discovery
+The paper's **RIGID WHITE panel starts at alpha=0.5** and **XOR WHITE starts at
+alpha=0.2**. So the paper itself skips alphas under the 90% accuracy gate — the
+same protocol we use. This is consistent with the paper's claim that RIGID is
+the hardest scenario at low SNR.
+
+### Discrepancy to investigate
+Our IME values are **5-100x lower** than the paper's for the proposed method:
+* LIN WHITE a=0.5: ours 0.0103 vs paper's best ~0.25
+* XOR CORR a=0.9: ours 0.0029 vs paper's ~0.04-0.10
+
+Our explanations appear far sparser/sharper than the paper's, OR the IME is
+being computed on a different normalization. Worth checking once the RIGID
+re-sweep lands. Note our IME for LIME is close to the paper's (0.68 vs 0.25-0.70),
+so the gap is specific to PatternLocal's output sharpness.

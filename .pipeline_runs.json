@@ -76,12 +76,12 @@
     "pushed_at": "2026-10-17T23:33:10.711954"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr": {
-    "notebook": "templates/data_generation/xai_tris_rigid_corr.py",
-    "pushed_at": "2026-10-19T22:14:28.155135"
+    "notebook": "notebooks/xai_tris_rigid_corr.py",
+    "pushed_at": "2026-10-20T22:08:41.779272"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white": {
-    "notebook": "templates/data_generation/xai_tris_rigid_white.py",
-    "pushed_at": "2026-10-19T23:04:32.853107"
+    "notebook": "notebooks/xai_tris_rigid_white.py",
+    "pushed_at": "2026-10-20T22:08:46.901505"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-1": {
     "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_1.py",

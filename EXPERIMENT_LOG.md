@@ -298,3 +298,37 @@ Our explanations appear far sparser/sharper than the paper's, OR the IME is
 being computed on a different normalization. Worth checking once the RIGID
 re-sweep lands. Note our IME for LIME is close to the paper's (0.68 vs 0.25-0.70),
 so the gap is specific to PatternLocal's output sharpness.
+
+---
+
+## 9. RIGID regeneration with the fixed generator (2026-10-21)
+
+Core v21:49 re-pushed with the RIGID fix; both data-gen kernels re-run.
+
+### New training accuracies (all 18 pass the 90% gate)
+| alpha | RIGID CORR | RIGID WHITE |
+|---|---|---|
+| 0.1 | 0.9930 | 0.9985 |
+| 0.2 | 0.9985 | 0.9995 |
+| 0.3 | **1.0000** | 1.0000 |
+| 0.4 | 0.9985 | 1.0000 |
+| 0.5 | 0.9990 | 1.0000 |
+| 0.6 | 1.0000 | 1.0000 |
+| 0.7 | 1.0000 | 1.0000 |
+| 0.8 | 1.0000 | 1.0000 |
+| 0.9 | 1.0000 | 1.0000 |
+
+Compare with the *old* generator: RIGID CORR alpha=0.1 was 0.4830 and only
+recovered at alpha>=0.6; RIGID WHITE failed at alpha=0.1 (0.7745).
+
+Note: the paper's Figure 4 only plots RIGID WHITE from alpha=0.5 and XOR WHITE
+from alpha=0.2 -- i.e. the paper also skipped low-SNR alphas. Our fixed RIGID
+clears the gate at every alpha, so we can plot the full 0.1-0.9 curve; this is
+a (favourable) difference from the paper worth stating explicitly.
+
+### Sweeps pushed (2026-10-21)
+* `rigid-corr-sweep-1..5` (CPU, 5 slots) -- alphas 0.1-0.5
+* `rigid-white-sweep-5` (**GPU**) -- alpha 0.5, the paper's qualitative config
+
+All RIGID CORR/WHITE sweep templates auto-skip any alpha with test accuracy
+< 90%; with the fix none should skip.

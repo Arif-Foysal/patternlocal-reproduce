@@ -118,7 +118,7 @@ pipeline:
       description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
       - id: xor_corr_sweep_1
-        gpu: true
+        gpu: false
         datasets: []
         success_criteria:
         - all 1 alpha complete for 13 methods
@@ -608,7 +608,7 @@ pipeline:
       description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
       - id: rigid_white_sweep_5
-        gpu: false
+        gpu: true
         datasets: []
         success_criteria:
         - all 1 alpha complete for 13 methods

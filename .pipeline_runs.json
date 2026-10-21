@@ -44,16 +44,16 @@
     "pushed_at": "2026-10-16T19:12:49.201378"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-1": {
-    "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_1.py",
-    "pushed_at": "2026-10-20T10:37:18.687213"
+    "notebook": "notebooks/xor_corr_sweep_1.py",
+    "pushed_at": "2026-10-21T12:56:30.569362"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-2": {
-    "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_2.py",
-    "pushed_at": "2026-10-20T10:29:08.501045"
+    "notebook": "notebooks/xor_corr_sweep_2.py",
+    "pushed_at": "2026-10-21T12:56:33.871978"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-3": {
     "notebook": "notebooks/xor_corr_sweep_3.py",
-    "pushed_at": "2026-10-21T08:30:33.034178"
+    "pushed_at": "2026-10-21T12:56:36.929428"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-ab-1": {
     "notebook": "templates/xor_corr_sweep/additional_baselines/xor_corr_ab_1.py",
@@ -186,5 +186,9 @@
   "mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr": {
     "notebook": "notebooks/phase2_clark_rigid_corr.py",
     "pushed_at": "2026-10-21T11:27:49.435112"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-white": {
+    "notebook": "notebooks/phase2_clark_rigid_white.py",
+    "pushed_at": "2026-10-21T12:56:27.211387"
   }
 }

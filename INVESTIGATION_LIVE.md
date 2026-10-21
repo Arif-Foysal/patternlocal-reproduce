@@ -25,19 +25,25 @@ the corrected (verbatim Clark et al.) data pipeline.
   Core dataset already refreshed with the clark_xai_tris vendor (11:08).
 
 ### Plan from here (the queue)
-1. WAIT for the 5 data-gen kernels; `pipeline.py results <phase>` + check
-   PASS/90% gate per alpha; record mask_px/Eq13 stats + pattern norms from
-   [RESULT] lines.
-2. `fetch` outputs; compare training_summary accuracies vs the paper's
-   (paper: ~0.9-1.0 across alphas for their MLP).
-3. Push phase2-clark-rigid-white when a slot frees.
-4. Build 54 Clark sweep kernels: copy the sweep templates, retarget
-   `kernel_sources` in config.yaml to the `phase2-clark-*` data kernels, push
-   in waves of 5 (order: xor-corr (completes the paper-comparable table
-   first), rigid-corr, lin-corr, lin-white, xor-white, rigid-white).
-5. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
+1. ~~WAIT for the 5 data-gen kernels~~ **DONE for 4 of 5** (11:50): lin-corr,
+   lin-white, xor-corr, xor-white all COMPLETE, `min_test_acc 1.0000` at ALL
+   9 alphas each (PASS). mask_px 862 (Eq.13 union/sign-preserving) matches
+   local-conversion smoke prediction. Log-only fetch trick used:
+   `kaggle kernels output <slug> -p /tmp/klog/<name> --file-pattern '.*\.log'`
+   (NO full fetch - user does not want multi-GB fetches; ask user if needed).
+2. rigid-corr data-gen: still running (11:50). rigid-white data-gen pushed
+   11:52, running.
+3. Sweeps on Clark data: config.yaml retargeted - xor-corr (all 9 sweeps),
+   lin-corr, lin-white, xor-white (9 each + qualitative) -> phase2-clark-*
+   slugs. RIGID sweep slugs left old until rigid data completes.
+4. PUSHED xor-corr sweep wave 1 (11:52): xor_corr_sweep_1/2/3 notebooks
+   copied from templates/ xor_evaluation/xor_corr_sweep/, all `running`.
+5. NEXT waves: xor-corr 4..9 (6 sweeps), then lin-corr 1..9, lin-white 1..9,
+   xor-white 1..9, then RIGID corr/white sweeps after retargeting their
+   kernel_sources at completion of rigid data-gen.
+6. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
    ours-vs-paper comparison vs `Baseline Paper/*-datapoints.md`.
-6. Final report + EXPERIMENT_LOG.md update; push origin.
+7. Final report + EXPERIMENT_LOG.md update; push origin.
 
 ### Watch items
 - Accuracy gate: Clark's alpha mapping differs; alpha=0.1 may be near/below

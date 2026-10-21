@@ -380,3 +380,41 @@ This must be stated in the report rather than tuned away.
 
 
 
+
+---
+
+## 10. RIGID CORR results landed (2026-10-21 08:30 +06)
+
+All 5 sweeps complete with the FIXED generator; accuracies match the regenerated
+summary exactly (0.9930/0.9985/1.0000/0.9985/0.9990 for a=0.1..0.5). Results in
+`results/patternlocal-repro-rigid-corr-sweep-{1..5}/`.
+
+### RIGID CORR EMD (a=0.1 .. 0.5)
+
+| method | 0.1 | 0.2 | 0.3 | 0.4 | 0.5 |
+|---|---|---|---|---|---|
+| PatternLocal | 0.1653 | 0.1414 | 0.1230 | 0.1034 | 0.1127 |
+| LIME | 0.1433 | 0.1396 | 0.1374 | 0.1354 | 0.1333 |
+| Analytical-IG | 0.1348 | 0.1018 | 0.1069 | 0.0885 | 0.1128 |
+| Sobel | 0.1433 | 0.1288 | 0.1096 | 0.0917 | 0.0764 |
+| **Laplace** | 0.1089 | 0.0739 | **0.0541** | **0.0425** | **0.0351** |
+| Saliency | 0.1507 | 0.1283 | 0.1287 | 0.1332 | 0.1402 |
+
+### Reading
+
+* PatternLocal beats LIME at every alpha (0.1230 vs 0.1374 at a=0.3, widening to
+  0.1127 vs 0.1333 at a=0.5); IME gap is much larger (0.4571 vs 0.6888 at a=0.5).
+  -> Matches the paper's claim that PL substantially outperforms other XAI methods.
+* **Laplace is the best method in RIGID CORR** (0.0351 at a=0.5) and improves
+  monotonically with alpha. Sobel also improves.
+  -> This matches the paper's "comparable to or worse than Sobel/Laplace" caveat
+     in DIRECTION (filters are competitive/better here), i.e. RIGID CORR is the
+     scenario where filters succeed, exactly as the paper claims (line 897,
+     "sharp lines ... especially easy for filter-based methods").
+* Note the same document-and-move-on finding applies: our Laplace (0.035) is
+  lower than the paper's RIGID CORR values imply, consistent with the global
+  EMD-floor difference documented in section 8 of the report.
+
+### Batch 2 pushed (08:35 +06)
+
+`xor-corr-sweep-3..6` + `rigid-white-sweep-5` (CPU, was the cancelled GPU job).

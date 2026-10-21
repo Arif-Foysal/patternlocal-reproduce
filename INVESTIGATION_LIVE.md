@@ -35,15 +35,32 @@ the corrected (verbatim Clark et al.) data pipeline.
    11:52, running.
 3. Sweeps on Clark data: config.yaml retargeted - xor-corr (all 9 sweeps),
    lin-corr, lin-white, xor-white (9 each + qualitative) -> phase2-clark-*
-   slugs. RIGID sweep slugs left old until rigid data completes.
+   slugs. RIGID sweep slugs retargeted at 12:20 (rigid-corr).
 4. PUSHED xor-corr sweep wave 1 (11:52): xor_corr_sweep_1/2/3 notebooks
    copied from templates/ xor_evaluation/xor_corr_sweep/, all `running`.
-5. NEXT waves: xor-corr 4..9 (6 sweeps), then lin-corr 1..9, lin-white 1..9,
-   xor-white 1..9, then RIGID corr/white sweeps after retargeting their
-   kernel_sources at completion of rigid data-gen.
-6. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
+5. RIGID CORR data-gen (12:05): COMPLETE but FAIL the 90% gate at alpha=0.1
+   (acc 0.5040 = coin flip). alpha>=0.2 all PASS (0.973..0.999). mask_px 157
+   (single tetromino, scale 4 -> 12x8 px), pattern_norm 6.02.
+   Interpretation: shipped-code RIGID (single tetromino) is unlearnable at
+   alpha=0.1 under the paper's global-Frobenius alpha mapping - corroborated
+   by Clark's own config which never sweeps TR below 0.375 (corr)/0.575
+   (white). This is the text-vs-code divergence showing up in DATA form
+   (paper text + Fig 4 imply RIGID at alpha=0.1 IS learnable -> the paper's
+   RIGID was likely the composite aT±aL variant).
+   USER DECISION (12:30): accept sub-90% accuracy at the first few noise
+   levels for RIGID - expected, not a blocker. So rigid-corr sweeps produce
+   valid points for alpha in {0.2..0.9}; alpha=0.1 is auto-skipped by the
+   sweep gate and documented as a data-provenance finding. Optional future
+   lever: composite-RIGID data-gen variant (paper-text semantics) if we must
+   cover alpha=0.1 - deferred until rigid-white lands.
+6. PUSHED rigid_corr_sweep_2 (12:25, alpha=0.2, shipped-code data), running.
+   5 slots FULL: xor-corr 1,2,3 + rigid-corr-2 sweeps + rigid-white datagen.
+7. NEXT waves: xor-corr 4..9 (6 sweeps), then lin-corr 1..9, lin-white 1..9,
+   xor-white 1..9, rigid-corr 3..9, rigid-white (retarget its kernel_source
+   to the clark data kernel only AFTER its datagen completes + gate check).
+8. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
    ours-vs-paper comparison vs `Baseline Paper/*-datapoints.md`.
-7. Final report + EXPERIMENT_LOG.md update; push origin.
+9. Final report + EXPERIMENT_LOG.md update; push origin.
 
 ### Watch items
 - Accuracy gate: Clark's alpha mapping differs; alpha=0.1 may be near/below

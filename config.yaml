@@ -6,7 +6,7 @@ kaggle:
     core: mdariffaysalnayem/patternlocal-repro-core
     xai_tris_xor_corr: mdariffaysalnayem/xai-tris-xor-corr
     xai_tris_lin_corr: mdariffaysalnayem/xai-tris-lin-corr
-    xai_tris_rigid_corr: mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+    xai_tris_rigid_corr: mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     xai_tris_xor_white: mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-white
     xai_tris_lin_white: mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-white
     xai_tris_rigid_white: mdariffaysalnayem/xai-tris-rigid-white
@@ -537,7 +537,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_2:
       description: 'SNR sweep part 2: alpha = 0.2'
       notebooks:
@@ -547,7 +547,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_3:
       description: 'SNR sweep part 3: alpha = 0.3'
       notebooks:
@@ -557,7 +557,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_4:
       description: 'SNR sweep part 4: alpha = 0.4'
       notebooks:
@@ -567,7 +567,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_5:
       description: 'SNR sweep part 5: alpha = 0.5'
       notebooks:
@@ -577,7 +577,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_6:
       description: 'SNR sweep part 6: alpha = 0.6'
       notebooks:
@@ -587,7 +587,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_7:
       description: 'SNR sweep part 7: alpha = 0.7'
       notebooks:
@@ -597,7 +597,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_8:
       description: 'SNR sweep part 8: alpha = 0.8'
       notebooks:
@@ -607,7 +607,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_corr_sweep_9:
       description: 'SNR sweep part 9: alpha = 0.9'
       notebooks:
@@ -617,7 +617,7 @@ pipeline:
         success_criteria:
         - all 1 alpha complete for 13 methods
         kernel_sources:
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
     phase3_rigid_white_sweep_1:
       description: 'SNR sweep part 1: alpha = 0.1'
       notebooks:
@@ -751,7 +751,7 @@ pipeline:
         - mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-white
         - mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-corr
         - mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-white
-        - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
         - mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-white
     diag_rigid_fix_validate:
       description: Validate fixed RIGID generator reaches >90% with real torch MLP

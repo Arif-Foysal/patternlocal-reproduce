@@ -101,7 +101,7 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-5": {
     "notebook": "notebooks/xor_corr_sweep_5.py",
-    "pushed_at": "2026-10-21T08:30:42.190838"
+    "pushed_at": "2026-10-21T17:17:44.315892"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-qualitative-lasso": {
     "notebook": "templates/xor_evaluation/xor_corr_qualitative_lasso/xor_corr_qualitative_lasso.py",
@@ -157,7 +157,7 @@
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-3": {
     "notebook": "notebooks/rigid_corr_sweep_3.py",
-    "pushed_at": "2026-10-20T23:59:08.152603"
+    "pushed_at": "2026-10-21T17:17:50.367969"
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-5": {
     "notebook": "notebooks/rigid_corr_sweep_5.py",
@@ -165,7 +165,7 @@
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-6": {
     "notebook": "notebooks/xor_corr_sweep_6.py",
-    "pushed_at": "2026-10-21T08:30:47.671153"
+    "pushed_at": "2026-10-21T17:17:47.690372"
   },
   "mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-corr": {
     "notebook": "notebooks/phase2_clark_lin_corr.py",

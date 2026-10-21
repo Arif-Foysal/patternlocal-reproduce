@@ -32,6 +32,45 @@ rigid-white 5. Let them finish.
 
 ---
 
+## 0d. GENERATOR DIFF RESOLVED (2026-10-21) — root cause identified + clark kernels built
+
+Their generator (`reference/xai-tris`, cloned today) vs our per-sample-L2
+reimplementation — exact diffs, and which matter:
+
+| aspect | theirs (Clark/PAPER Eq.12) | ours | impact |
+|---|---|---|---|
+| normalization | **GLOBAL** Frobenius over the full 40000-sample matrices (paper Eq. 12 text confirms: "horizontally concatenated into matrices and normalized by the Frobenius norm") | per-sample L2 | **ROOT CAUSE of scale offset** — different alpha<->difficulty mapping; per-sample SNR also varies sample-to-sample in theirs, constant in ours |
+| rescale | 1/max\|x\| over whole dataset, then float16 | none, float64 | minor |
+| background | N(0, **0.5**) per px (their `var_data` used as sigma) | N(0,1) per px | changes effective alpha scale |
+| pattern | 3x2-cell t/l via kron: 24x16 px (scale 8 LIN/XOR); **12x8 px (scale 4 RIGID)** | 3x3-cell T/L, 24x24 px everywhere | mask size/geometry differ everywhere |
+| RIGID structure | **single tetromino per sample** (t vs l), random rot90 + random place anywhere | composite aT±aL, quadrant-constrained | paper *text* says composite; their *code* says single. We follow SHIPPED CODE (defensible), document the text-code divergence |
+| XOR structure | t@(8,8) & l@(32,40), 4 sign-manips; y=0:(++),(--), y=1:(+-),(-+) — structurally EQUIVALENT to ours | fixed T/L, T±L + global flip | equivalent |
+| smoothing | gaussian sigma=1.5, **no 5% support threshold** in generator | same blur + 5% relative threshold | the threshold lives in paper Eq. 13 (mask def), not the generator — ours is right per paper |
+| split | StratifiedShuffleSplit 90/5/5, SEED=4000002 | random perm 90/5/5, seed crc32 | equivalent |
+| eval nuance | Clark's eval uses absolute-0.05 mask threshold (not rel 5%) and EMD score = 1 - cost/Dmax (similarity) | Eq. 10 raw OT cost | PatternLocal paper redefined the metric; keep Eq.10 |
+
+**Decision: swap generator to theirs, verbatim.** Built this session:
+- `src/paper_repro/clark_xai_tris/` — vendored upstream files
+  (minimal relative-import patch only, GPL-3.0, README with provenance)
+  + `conversion.py` (pickle -> npz, masks per paper Eq. 13/14 relative-5%
+  sign-preserving; LIN = Eq.14 union; also stores Clark's abs-0.05 masks +
+  raw masks for diagnostics) + `kaggle_datagen.py` (runs their
+  `data_generation_process` verbatim, trains the SAME MLP - which matches
+  the paper's stated 128/64/32/16 + 25% dropout architecture).
+- `templates/phase2_clark_{lin,xor,rigid}_{white,corr}.py` (6 thin kernels)
+  + config.yaml phases `phase2_clark_*` (dataset mounts: core only).
+- Local smoke of conversion passed (XOR sign-sym masks 432px both classes;
+  LIN union 862px; abs05 correctly halves XOR support).
+
+**Next:** (a) `pipeline.py upload-src` to refresh core dataset with the
+vendor; (b) when the 5 in-flight old-generator kernels finish, push Clark
+data-gen (5 slots: lin-corr, lin-white, xor-corr, xor-white, rigid-corr;
+rigid-white follows); (c) verify accuracies + mask stats; (d) point the
+sweep templates' kernel_sources at `patternlocal-repro-clark-*` outputs and
+re-run all 54 sweeps on the new data.
+
+---
+
 ## 0. What is running RIGHT NOW on Kaggle
 
 State at last check (2026-10-21 01:13 +06):

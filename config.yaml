@@ -76,6 +76,60 @@ pipeline:
         success_criteria:
         - all 9 alphas complete
         - test accuracy > 90%
+    phase2_clark_lin_corr:
+      description: Clark et al. ORIGINAL generator - LIN CORR data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_lin_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
+    phase2_clark_lin_white:
+      description: Clark et al. ORIGINAL generator - LIN WHITE data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_lin_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
+    phase2_clark_xor_corr:
+      description: Clark et al. ORIGINAL generator - XOR CORR data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_xor_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
+    phase2_clark_xor_white:
+      description: Clark et al. ORIGINAL generator - XOR WHITE data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_xor_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
+    phase2_clark_rigid_corr:
+      description: Clark et al. ORIGINAL generator - RIGID CORR data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_rigid_corr
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
+    phase2_clark_rigid_white:
+      description: Clark et al. ORIGINAL generator - RIGID WHITE data (Eq.12 global Frobenius)
+      notebooks:
+      - id: phase2_clark_rigid_white
+        gpu: false
+        datasets: []
+        success_criteria:
+        - all 9 alphas complete
+        - test accuracy > 90%
     phase3:
       description: Single-config evaluation (XOR CORR alpha=0.2)
       notebooks:

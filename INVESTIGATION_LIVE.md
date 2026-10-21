@@ -418,3 +418,15 @@ summary exactly (0.9930/0.9985/1.0000/0.9985/0.9990 for a=0.1..0.5). Results in
 ### Batch 2 pushed (08:35 +06)
 
 `xor-corr-sweep-3..6` + `rigid-white-sweep-5` (CPU, was the cancelled GPU job).
+
+## 11. LOCKED datapoints recorded (08:45 +06)
+
+Full EMD/IME tables for every valid config (13 methods x 9 configs) written to
+**`results/LOCKED_DATAPOINTS.md`**. Valid set:
+
+* RIGID_CORR a=0.1..0.5 (fixed generator, accs match regenerated summary)
+* XOR_CORR a=0.1, 0.2, 0.9
+* LIN_WHITE a=0.5
+
+Everything else is missing/in-flight/invalid. Old rigid-corr-6 and rigid-white-5
+results are excluded (old generator).

@@ -3,11 +3,54 @@
 > **This file is the running context record. Update it as work proceeds.**
 > If the session is lost, read this first.
 
-Last updated: 2026-10-21 11:15 +06
+Last updated: 2026-10-21 11:35 +06
 
 ---
 
-## 0c. BREAKTHROUGH (11:15): original XAI-TRIS generator is PUBLIC
+## 0e. FRESH START ON THE CLARK GENERATOR (2026-10-21 11:30 +06)
+
+User decision: abandon the old-generator branch, start absolutely fresh with
+the corrected (verbatim Clark et al.) data pipeline.
+
+- Old results archived to `results_legacy_old_generator_2026-10-21.tar.gz`
+  (36 MB, repo root, gitignored). `results/` emptied; only `figures/` recreated.
+  The md reports (LOCKED_DATAPOINTS, FILTER_DIVERGENCE_REPORT) remain in git
+  history for citation in the final report.
+- User CANCELLED the 5 in-flight old-generator kernels (xor-corr-sweep-3..6,
+  rigid-white-sweep-5): verified `cancel_acknowledged`.
+- PUSHED wave 1 of Clark data-gen (11:31, all `running` as of 11:33):
+    phase2-clark-lin-corr, phase2-clark-lin-white, phase2-clark-xor-corr,
+    phase2-clark-xor-white, phase2-clark-rigid-corr
+  (rigid-white queued for the next free slot).
+  Core dataset already refreshed with the clark_xai_tris vendor (11:08).
+
+### Plan from here (the queue)
+1. WAIT for the 5 data-gen kernels; `pipeline.py results <phase>` + check
+   PASS/90% gate per alpha; record mask_px/Eq13 stats + pattern norms from
+   [RESULT] lines.
+2. `fetch` outputs; compare training_summary accuracies vs the paper's
+   (paper: ~0.9-1.0 across alphas for their MLP).
+3. Push phase2-clark-rigid-white when a slot frees.
+4. Build 54 Clark sweep kernels: copy the sweep templates, retarget
+   `kernel_sources` in config.yaml to the `phase2-clark-*` data kernels, push
+   in waves of 5 (order: xor-corr (completes the paper-comparable table
+   first), rigid-corr, lin-corr, lin-white, xor-white, rigid-white).
+5. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
+   ours-vs-paper comparison vs `Baseline Paper/*-datapoints.md`.
+6. Final report + EXPERIMENT_LOG.md update; push origin.
+
+### Watch items
+- Accuracy gate: Clark's alpha mapping differs; alpha=0.1 may be near/below
+  the 90% gate in some scenarios (their own configs used alpha 0.03-0.65).
+  If a point fails, document - do not retune.
+- RIGID = single tetromino per shipped code (text-vs-code divergence
+  documented in the vendor README).
+- Old-generator vs new: the archived tarball lets us quantify exactly how much
+  of the Fig-4 divergence was generator semantics, if asked.
+
+---
+
+## 0c. BREAKTHROUGH (earlier): original XAI-TRIS generator found PUBLIC
 
 `github.com/braindatalab/xai-tris` (Clark et al.'s own repo, GPL-3.0, updated
 2025-05). Contains:

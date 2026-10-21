@@ -166,5 +166,25 @@
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-6": {
     "notebook": "notebooks/xor_corr_sweep_6.py",
     "pushed_at": "2026-10-21T08:30:47.671153"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-corr": {
+    "notebook": "notebooks/phase2_clark_lin_corr.py",
+    "pushed_at": "2026-10-21T11:27:36.638232"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-white": {
+    "notebook": "notebooks/phase2_clark_lin_white.py",
+    "pushed_at": "2026-10-21T11:27:39.910631"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-corr": {
+    "notebook": "notebooks/phase2_clark_xor_corr.py",
+    "pushed_at": "2026-10-21T11:27:43.186995"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-white": {
+    "notebook": "notebooks/phase2_clark_xor_white.py",
+    "pushed_at": "2026-10-21T11:27:46.362931"
+  },
+  "mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr": {
+    "notebook": "notebooks/phase2_clark_rigid_corr.py",
+    "pushed_at": "2026-10-21T11:27:49.435112"
   }
 }

@@ -55,12 +55,21 @@ the corrected (verbatim Clark et al.) data pipeline.
    cover alpha=0.1 - deferred until rigid-white lands.
 6. PUSHED rigid_corr_sweep_2 (12:25, alpha=0.2, shipped-code data), running.
    5 slots FULL: xor-corr 1,2,3 + rigid-corr-2 sweeps + rigid-white datagen.
-7. NEXT waves: xor-corr 4..9 (6 sweeps), then lin-corr 1..9, lin-white 1..9,
-   xor-white 1..9, rigid-corr 3..9, rigid-white (retarget its kernel_source
-   to the clark data kernel only AFTER its datagen completes + gate check).
-8. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
+6b. RIGID WHITE data-gen (13:05): COMPLETE, FAIL gate at alpha<=0.6
+   (acc: 0.1-0.3 ~0.49-0.52, 0.4 0.5665, 0.5 0.7185, 0.6 0.8465); PASS at
+   alpha>=0.7 (0.7 0.9730, 0.8 0.9970, 0.9 0.9990). Single-tetromino RIGID
+   under white bg needs very high alpha - matches Clark's own shipped config
+   (TR uncorrelated alpha=0.575). Sweep-valid alphas: {0.7,0.8,0.9} only.
+   More evidence the paper's RIGID is a different (composite) variant.
+   All 6 Clark data kernels now complete.
+7. Rigid-white kernel_source retargeted to phase2-clark-rigid-white (13:05).
+8. PUSHED xor_corr_sweep_4 (13:06) - queue order xor-first.
+   5 slots FULL: xor-corr 1,2,3,4 + rigid-corr-2.
+9. NEXT waves: xor-corr 5..9 (5 sweeps), then lin-corr 1..9, lin-white 1..9,
+   xor-white 1..9, rigid-corr 3..9, rigid-white 7..9 (valid ones last).
+10. Regenerate six-panel EMD/IME curves (scripts/plot_curves.py) and redo the
    ours-vs-paper comparison vs `Baseline Paper/*-datapoints.md`.
-9. Final report + EXPERIMENT_LOG.md update; push origin.
+11. Final report + EXPERIMENT_LOG.md update; push origin.
 
 ### Watch items
 - Accuracy gate: Clark's alpha mapping differs; alpha=0.1 may be near/below

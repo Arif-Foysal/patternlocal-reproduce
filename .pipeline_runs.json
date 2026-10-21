@@ -68,12 +68,12 @@
     "pushed_at": "2026-10-17T01:03:05.916525"
   },
   "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-2": {
-    "notebook": "templates/lin_evaluation/lin_corr_sweep/lin_corr_sweep_2.py",
-    "pushed_at": "2026-10-17T23:33:33.548229"
+    "notebook": "notebooks/lin_corr_sweep_2.py",
+    "pushed_at": "2026-10-21T23:51:24.571212"
   },
   "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-1": {
-    "notebook": "templates/lin_evaluation/lin_corr_sweep/lin_corr_sweep_1.py",
-    "pushed_at": "2026-10-17T23:33:10.711954"
+    "notebook": "notebooks/lin_corr_sweep_1.py",
+    "pushed_at": "2026-10-21T23:51:22.207278"
   },
   "mdariffaysalnayem/patternlocal-repro-xai-tris-rigid-corr": {
     "notebook": "notebooks/xai_tris_rigid_corr.py",
@@ -190,5 +190,17 @@
   "mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-white": {
     "notebook": "notebooks/phase2_clark_rigid_white.py",
     "pushed_at": "2026-10-21T12:56:27.211387"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-7": {
+    "notebook": "notebooks/xor_corr_sweep_7.py",
+    "pushed_at": "2026-10-21T23:51:16.959625"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-8": {
+    "notebook": "notebooks/xor_corr_sweep_8.py",
+    "pushed_at": "2026-10-21T23:51:19.513627"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-3": {
+    "notebook": "notebooks/lin_corr_sweep_3.py",
+    "pushed_at": "2026-10-21T23:51:28.869533"
   }
 }

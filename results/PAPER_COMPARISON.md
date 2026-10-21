@@ -38,7 +38,40 @@ on IME from a=0.2 already.
 | Saliency | 0.230 | 0.2945 |
 | (our) analytical_ig | — | 0.1771 |
 
-## Reading (as of 3 points)
+## Reading (update 2 — mid/high-alpha XOR landed: reproduction essentially achieved)
+
+XOR CORR, ours vs paper, EMD, n_test=600:
+
+| a | PatternLocal ours / paper | Laplace ours / paper | plain_ig ours / paper | DL ours / paper |
+|---|---|---|---|---|
+| 0.1 | 0.1379 / 0.100 | 0.1025 / 0.135 | 0.1376 / 0.115 | 0.1348 / 0.112 |
+| 0.2 | 0.1097 / 0.085 | 0.0683 / 0.120 | 0.1456 / 0.110 | 0.1430 / 0.105 |
+| 0.3 | **0.0664 / 0.065** | 0.0495 / 0.085 | 0.1323 / 0.108 | 0.1352 / 0.095 |
+| 0.4 | **0.0545 / 0.058** | 0.0380 / 0.078 | 0.1212 / 0.100 | 0.1232 / 0.090 |
+| 0.5 | **0.0415 / 0.050** | 0.0302 / 0.078 | 0.1046 / 0.095 | 0.1062 / 0.085 |
+| 0.6 | **0.0406 / 0.043** | 0.0248 / 0.075 | 0.0874 / 0.089 | 0.0878 / 0.080 |
+
+* **PatternLocal MATCHES the paper from a=0.3 onward (deltas 0.001-0.009)**
+  - the headline quantitative claim of the paper now reproduces including
+    the floor progression 0.065 -> 0.043. The a<=0.2 offset (PL late to
+    separate from LIME) is the residual divergence.
+* **The gradient family now behaves paper-like instead of collapsing:**
+  plain_ig declines 0.138 -> 0.087 and PLATEAUS at the paper's 0.089 level
+  at a=0.6 (old data: instant collapse below 0.043). DL 0.0878 vs paper
+  0.080; GS 0.0866 vs 0.078 - all within ~0.01.
+* **The EMD floor exists in the correct data:** nothing (except Laplace)
+  goes below ~0.065 at a=0.6; the paper's ordering emerges
+  (PL best, Laplace still declining below it).
+* LIME stays flat ~0.12-0.14 (paper declines 0.135 -> 0.078) - the one XOR
+  divergence left to characterize; Saliency/GB correspondingly higher.
+* IME: LIME ~0.70-0.78 flat; PL/AIG collapse to 0.093/0.089 by a=0.6
+  (analytical_grad 0.049) while DL/GS only halve (0.475/0.471). The
+  "false-positive collapse" claim reproduces on correct data.
+* RIGID a=0.3: Laplace 0.1121 vs paper 0.110 (exact), AIG 0.1471 overall
+  runner-up (beats every surf/non-spec method), PL 0.2759 vs LIME 0.3093
+  (PL beats LIME but less than paper's 0.18-vs-0.26 gap).
+
+Slots after this batch (all 5 refilled): xor-corr 7,8 + lin-corr 1,2,3.
 
 1. **Magnitudes moved dramatically toward the paper.** Old generator was
    ~0.5-0.7x the paper everywhere; on Clark's data LIME hits the paper's

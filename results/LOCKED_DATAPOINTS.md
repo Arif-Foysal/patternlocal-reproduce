@@ -39,6 +39,56 @@ default behaviour unchanged), and masks were verified byte-identical before/afte
 must be re-run. Batch 2 (xor-corr 3-6, in flight) uses this exact code+data, so
 the curves stay consistent.
 
+## XOR_CORR: ours vs the paper's plot (`Baseline Paper/xor-corr-datapoints.md`)
+
+"Locked" means **validated against our own code/data** — it does NOT mean
+"matches the paper". Here is the explicit comparison (EMD; ours = full-set POT):
+
+| method | ours a=0.1 -> 0.2 -> 0.9 | paper a=0.1 -> 0.2 -> 0.9 | trend match |
+|---|---|---|---|
+| PatternLocal | 0.132 -> 0.103 -> 0.035 | 0.100 -> 0.085 -> 0.048 | direction yes; we go BELOW the paper's floor 0.043 |
+| LIME | 0.120 -> 0.121 -> 0.101 | 0.135 -> 0.125 -> 0.080 | direction yes; ours improves less |
+| Sobel | 0.122 -> 0.108 -> **0.020** | 0.140 -> 0.130 -> 0.125 (flat) | **NO** - ours collapses 6x |
+| Laplace | 0.092 -> 0.063 -> **0.016** | 0.135 -> 0.120 -> 0.080 | **NO** - ours collapses 6x |
+| IntegratedGradients | 0.133 -> 0.135 -> **0.026** | 0.115 -> 0.110 -> 0.090 | **NO** - ours collapses |
+| DeepLift | 0.125 -> 0.133 -> **0.027** | 0.112 -> 0.105 -> 0.080 | **NO** - ours collapses |
+| GradientShap | 0.131 -> 0.133 -> **0.026** | 0.105 -> 0.110 -> 0.075 | **NO** - ours collapses |
+| Saliency | 0.098 -> 0.113 -> 0.119 | 0.068 -> 0.080 -> 0.088 | direction yes; ours worse at low a (no Saliency dip) |
+| GuidedBackprop | 0.094 -> 0.109 -> 0.117 | 0.105 -> 0.080 -> 0.078 | mixed |
+
+Range across alpha, ours vs paper (collapse methods are 3-5x wider):
+
+| method | ours range | paper range |
+|---|---|---|
+| PatternLocal | 0.098 | 0.057 |
+| LIME | 0.020 | 0.057 |
+| Saliency | 0.021 | 0.021 |
+| GuidedBackprop | 0.023 | 0.030 |
+| Sobel | **0.102** | 0.019 |
+| Laplace | **0.076** | 0.060 |
+| plain IG | **0.109** | 0.026 |
+| DeepLift | **0.106** | 0.032 |
+| GradientShap | **0.106** | 0.035 |
+
+**The structural failure:** the paper's curves saturate at EMD >= 0.043 for EVERY
+method (so at a=0.9 PatternLocal 0.048 stands out as uniquely best, next is 0.075).
+In ours, 6 methods (Sobel, Laplace, IG, DeepLift, GradientShap, and PL itself at
+0.035) reach or go below that floor, so at a=0.9 PatternLocal is NOT the single
+best method in our reproduction - Laplace (0.016), Sobel (0.020), plain IG
+(0.026), GradientShap (0.026) and DeepLift (0.027) beat it. In the paper's world
+PL is #1 by 0.027; in ours it is ~#6.
+
+Consequences for the reproduction claims:
+* REPRODUCED: PL beats LIME clearly at a>=0.2 on both metrics; IME collapse.
+* NOT REPRODUCED: PL as uniquely-best method in XOR at high SNR; the paper's
+  filter/IG-family baseline magnitudes and flat-vs-alpha trend.
+
+Root-cause status: exhausted implementation space (12 filter variants, mask
+geometry, POT verification, Eq. 10-14 all verified character-exact); conclusion is
+a data-level difference in the un-shipped XAI-TRIS generator (Clark et al. [8]).
+Full analysis: results/FILTER_DIVERGENCE_REPORT.md. Decision (2026-10-21):
+document and move on - do not tune to match.
+
 ## Sweep status
 
 | scenario | locked | running | missing |

@@ -3,7 +3,32 @@
 > **This file is the running context record. Update it as work proceeds.**
 > If the session is lost, read this first.
 
-Last updated: 2026-10-21
+Last updated: 2026-10-21 11:15 +06
+
+---
+
+## 0c. BREAKTHROUGH (11:15): original XAI-TRIS generator is PUBLIC
+
+`github.com/braindatalab/xai-tris` (Clark et al.'s own repo, GPL-3.0, updated
+2025-05). Contains:
+- `data/generate_data` with `data/data_config.json` (64x64 + 8x8 modes)
+- scenarios: `linear | xor | translations_rotations` (= LIN/XOR/RIGID)
+- backgrounds: `uncorrelated | correlated | imagenet` (= WHITE/CORR)
+- `eval/quantitative_metrics` (their EMD/IME implementations)
+- also 8x8 mode used by some of their results
+
+**This eliminates the one uncontrolled factor in the divergence attribution**
+("our generator reimplemented from prose may differ from theirs"). Path:
+1. Clone/port their generator; pixel-level diff vs ours (mask px, geometry,
+   smoothing, noise normalization).
+2. If difference is a placement/mask subtlety -> align OUR generator to theirs
+   (lowest risk; sweep machinery unchanged). Else swap the generator entirely.
+3. Regenerate data -> re-run data-gen kernels -> re-run sweeps.
+4. Either clean full reproduction, or a bulletproof reproducibility finding.
+
+**HOLD: do not push new sweeps** beyond the 5 in flight until the generator
+decision lands (avoid double compute). In-flight: xor-corr 3,4,5,6 +
+rigid-white 5. Let them finish.
 
 ---
 

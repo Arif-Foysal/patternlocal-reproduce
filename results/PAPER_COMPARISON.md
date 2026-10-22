@@ -117,6 +117,30 @@ lin-corr 4,5,6,7; later lin-corr-8.
   recovery on linear ground truth (AG/AIG/PL all within 0.0005 of each
   other (0.0195/0.0198/0.0200)); IME also converges (0.056-0.058).
   Vanilla IG family stuck at 0.14, LIME flat 0.12.
+* LIN a=0.6 confirms convergence onset: AIG 0.0298 = PL 0.0297,
+  AG 0.0242 best; Laplace 0.2057 fails, LIME flat 0.1248.
+
+## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
+
+Final point a=0.9 (ours / paper): PL **0.0331 / 0.048**, LIME 0.1171/0.082,
+Laplace 0.0157/0.078, Sobel 0.0213/0.124, plain_ig 0.0331/0.091,
+DL 0.0313/0.081, GS 0.0312/0.076, Sab GB 0.1352/0.078, Sal 0.1376/0.088.
+
+* Full PL XOR curve (ours vs paper): 0.1379/0.100, 0.1097/0.085,
+  0.0664/0.065, 0.0545/0.058, 0.0415/0.050, 0.0406/0.043, 0.0397/0.045,
+  0.0440/0.045, **0.0331/0.048**. Reproduction quality: near-exact from
+  a=0.3-0.8 (deltas <= 0.009); at a=0.9 ours sits a bit lower.
+* At a=0.9 the field bunches at the floor: PL 0.0331 is tied with
+  plain_ig 0.0331, DL 0.0313, GS 0.0312, AG 0.0676 - and below it
+  Laplace 0.0157/Sobel 0.0213. So "PL uniquely best" does NOT hold in
+  our run at a=0.9 (paper: PL 0.048 uniquely best, next GS 0.076) - the
+  Laplace/Sobel-overdecline caveat extends to the vanilla-IG family
+  merging with PL at the floor. IME story stays clean: PL/AIG/AG
+  0.0185/0.0183/0.0178 vs LIME 0.68, Sal 0.79, vanilla family 0.15.
+* IME false-positive collapse at a=0.9 total: 27x vs LIME.
+
+Slots refilled (2026-10-22 pm): lin-corr-9 (completes LIN corr table) +
+lin-white-1 (white-background stage opens).
 
 ## Analytical-IG vs the field (all 14 completed points, Clark data)
 

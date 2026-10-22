@@ -97,7 +97,26 @@ XOR CORR, ours vs paper, EMD, n_test=600:
   of RIGID, consistent with the paper's filter-success taxonomy.
 
 Slots refilled (2026-10-22 am): xor-corr-9 (completes XOR table) +
-lin-corr 4,5,6,7.
+lin-corr 4,5,6,7; later lin-corr-8.
+
+## LIN CORR trajectory (ours; no paper table - paper text only)
+
+| a | AIG | PL | AG | Laplace | Sobel | LIME |
+|---|---|---|---|---|---|---|
+| 0.1 | 0.1245 | 0.1346 | 0.1160 | 0.1254 | - | 0.1349 |
+| 0.2 | 0.1118 | 0.1096 | 0.0575 | 0.1433 | - | 0.1327 |
+| 0.3 | 0.1024 | 0.1063 | 0.0444 | 0.1660 | - | 0.1313 |
+| 0.7 | **0.0198** | 0.0200 | 0.0195 | 0.2138 | 0.1725 | 0.1228 |
+
+* **Filter-failure taxonomy reproduces sharply in LIN CORR:** Laplace
+  MONOTONELY WORSENS with alpha (0.125 -> 0.214 by a=0.7); Sobel 0.17.
+  The paper's claim (filters succeed in RIGID, fail in LIN) is now
+  demonstrated on both sides: RIGID Laplace near-exact vs paper, LIN
+  Laplace catastrophically fails.
+* The analytic family converges to ~0.020 EMD at a=0.7 - near-exact
+  recovery on linear ground truth (AG/AIG/PL all within 0.0005 of each
+  other (0.0195/0.0198/0.0200)); IME also converges (0.056-0.058).
+  Vanilla IG family stuck at 0.14, LIME flat 0.12.
 
 ## Analytical-IG vs the field (all 14 completed points, Clark data)
 

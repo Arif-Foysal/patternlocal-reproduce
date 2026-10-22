@@ -166,6 +166,36 @@ Final LIN CORR table (AIG EMD; PL; AG; Laplace EMD & rank/13):
 
 Slots refilled (2026-10-22 pm): lin-white-5 (white stage 5/9 running).
 
+## LIN WHITE (white background) — first reading a=0.2
+
+| method | EMD | IME | rank/13 |
+|---|---|---|---|
+| analytical_grad | 0.0175 | 0.0598 | **1** |
+| analytical_ig | 0.0180 | 0.0649 | **2** |
+| patternlocal | 0.0204 | 0.0928 | 3 |
+| gradient_shap | 0.1018 | 0.6007 | 4 |
+| plain_ig | 0.1052 | 0.6207 | 5 |
+| deeplift | 0.1208 | 0.7014 | 7 |
+| lime | 0.1286 | 0.7404 | 11 |
+| laplace | 0.1375 | 0.7864 | 12 |
+| sobel | 0.1382 | 0.7878 | 13 |
+
+* **The analytic family dominates LIN WHITE from the first point:**
+  AG/AIG/PL are ranks 1-3 with EMD ~10x better than the rest of the
+  field. AIG 0.0180 vs PL 0.0204 (AIG ahead), and both beat LIME
+  (0.1286) by 6-7x. White background does not harm the covariance
+  family at all - it clears the field.
+* **Filters are the WORST methods on white background** immediately:
+  Laplace 12th, Sobel last (13th). This makes the filter taxonomy
+  fully scenario-dependent in a coherent way (best in RIGID black,
+  worst in LIN white/corr).
+* No "filters succeed on white" claim of the paper is visible here at
+  a=0.2; need the rest of the LIN WHITE curve to see if SOBEL/Laplace
+  recover at high alpha (paper reports filter success specifically in
+  RIGID, failure in LIN, so this is consistent so far).
+
+Slots refilled (2026-10-22 pm): lin-white-6.
+
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 
 Final point a=0.9 (ours / paper): PL **0.0331 / 0.048**, LIME 0.1171/0.082,

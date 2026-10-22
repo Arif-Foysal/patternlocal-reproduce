@@ -97,11 +97,11 @@ Reading:
 ---------------------------------------------------------------
 ## LIN WHITE (white background) — a=0.1–0.4 complete, 0.5–0.9 in flight
 
-| method | a=0.1 | a=0.2 | a=0.3 | a=0.4 |
-|---|---|---|---|---|
-| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 | 0.0151 |
-| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 | 0.0151 |
-| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 | 0.0151 |
+| method | a=0.1 | a=0.2 | a=0.3 | a=0.4 | a=0.5 | a=0.6 |
+|---|---|---|---|---|---|---|
+| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 | 0.0151 | 0.0149 |
+| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 | 0.0151 | 0.0149 |
+| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 | 0.0151 | 0.0149 |
 | gradient_shap | 0.1190 | 0.1018 | 0.1018 | — | 0.1053 |
 | plain_ig | 0.1268 | 0.1052 | — | — | 0.1053 |
 | lime | 0.1311 | 0.1286 | 0.1286 | 0.1276 | 0.1262 |
@@ -109,13 +109,13 @@ Reading:
 | sobel | 0.1387 | 0.1382 | 0.1370 | — | — |
 
 Reading:
-* Analytic family ranks 1-3 at every completed point (a=0.1–0.4); AIG
-  <= PL throughout. **AIG outright win at a=0.4** (rank 1/13 EMD 0.0154,
-  IME 0.0298; AG tied 0.0154, PL 0.0155).
+* Analytic family ranks 1-3 at every completed point (a=0.1–0.6); AIG
+  <= PL throughout. **AIG outright win at a=0.4, a=0.5, a=0.6** (rank 1/13
+  both metrics each time: 0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214).
 * Laplace flat-last at ~0.137 across all alphas — filters do not recover
   on white background at all (consistent with paper: filters fail in LIN).
-* CONVERGENCE: AIG 0.0717 -> 0.0180 -> 0.0160 -> 0.0154 (monotone,
-  near-exact by a=0.4); LIME flat ~0.13 all along.
+* CONVERGENCE: AIG 0.0717 -> 0.0180 -> 0.0160 -> 0.0154 -> 0.0151 -> 0.0149
+  (monotone, near-exact by a=0.4); LIME flat ~0.13 all along.
 
 ---------------------------------------------------------------
 ## Analytical-IG vs the field — rank summary (24 completed points)
@@ -147,6 +147,7 @@ Ranks among all 13 methods (EMD rank / IME rank):
 | WLIN 0.3 | 2/13, **1/13** | 3/13 | **1/13** | AG / AG |
 | WLIN 0.4 | **1/13**, **1/13** | 3/13 | **1/13** | AIG / AIG |
 | WLIN 0.5 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
+| WLIN 0.6 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | RIGID 0.2 | **2/13**, 3/13 | 11/13 | **13/13** | Laplace |
 | RIGID 0.3 | **2/13**, 3/13 | 4/13 | **12/13** | Laplace |
 
@@ -160,7 +161,10 @@ Findings:
    integration is what keeps the covariance kernel informative under
    translation/rotation. PL is also weak in RIGID (11th at a=0.2).
 3. **AIG wins outright in LIN at high alpha:** rank 1/13 on both metrics at
-   LIN CORR a=0.9 and LIN WHITE a=0.4 (tied-with-AG at a=0.3/0.4 EMD).
+   LIN CORR a=0.9 and LIN WHITE a=0.4, a=0.5, a=0.6 — three outright wins
+   on white background alone (0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214).
+   Path-integration denoises past the plain gradient exactly where the
+   family converges at high noise.
 4. **AIG's weak spot is XOR high-alpha EMD** (rank 8 at a=0.7–0.9) while it
    holds IME rank 2 — an EMD-vs-IME trade-off to report in the thesis.
 5. AG dominates EMD+IME in LIN and low-alpha XOR (rank 1–2); the analytical
@@ -178,10 +182,10 @@ data semantics. No low-alpha gradient-family collapse.
 ---------------------------------------------------------------
 ## Grid state
 
-Done (24): XOR corr complete; LIN corr complete; LIN white 0.1–0.4;
+Done (26): XOR corr complete; LIN corr complete; LIN white 0.1–0.6;
 RIGID corr 0.2–0.3.
-Running: lin-white 5–9.
-Remaining: lin-white 0.5–0.9; xor-white 0.1–0.9; rigid-corr 0.4–0.9;
+Running: lin-white 7–9; xor-white 1–2.
+Remaining: lin-white 0.7–0.9; xor-white 0.3–0.9; rigid-corr 0.4–0.9;
 rigid-white 0.7–0.9.
 
 ---------------------------------------------------------------

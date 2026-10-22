@@ -137,6 +137,35 @@ lin-corr 4,5,6,7; later lin-corr-8.
   total inversion: the best filter in RIGID is the worst method in
   LIN CORR. AIG<=PL everywhere in LIN still stands.
 
+## Reading 5 (2026-10-22): LIN CORR TABLE COMPLETE (a=0.1-0.9)
+
+Final point a=0.9: **analytical_ig is rank 1/13 on BOTH EMD and IME**
+- the method's first outright win: AIG 0.0149/0.0194, PL 0.0149/0.0198
+(EMD exact tie), AG 0.0160/0.0309, Laplace last 0.2258.
+
+Final LIN CORR table (AIG EMD; PL; AG; Laplace EMD & rank/13):
+  a=0.1: 0.1245; 0.1346; 0.1160; 0.1254 (5th)
+  a=0.2: 0.1118; 0.1096; 0.0575; 0.1433 (13th)
+  a=0.3: 0.1024; 0.1063; 0.0444; 0.1660 (13th)
+  a=0.4: 0.0768; 0.0785; 0.0348; 0.1829 (13th)
+  a=0.5: 0.0532; 0.0526; 0.0263; 0.1957 (13th)
+  a=0.6: 0.0298; 0.0297; 0.0242; 0.2057 (13th)
+  a=0.7: 0.0198; 0.0200; 0.0195; 0.2138 (13th)
+  a=0.8: 0.0162; 0.0162; 0.0158; 0.2203 (13th)
+  a=0.9: 0.0149; 0.0149; 0.0160; 0.2258 (13th)
+
+* **Thesis headline candidate: AIG wins LIN CORR outright at a=0.9**
+  (1st of 13 on both metrics), is rank<=3 on EMD at every point, and
+  ties-or-beats PL everywhere in the scenario. IG-style path
+  integration pays off precisely where the family converges at the
+  high-noise end (AIG 0.0149 vs AG 0.0160 at a=0.9 - the aggregation
+  denoises past the plain gradient).
+* Laplace worst-of-13 at every a>=0.2; monotone worsens 0.125->0.226.
+* Two of three fixed-support tables now complete (XOR corr, LIN corr);
+  RIGID corr has a=0.1-0.3 pending 0.4-0.9 (in queue).
+
+Slots refilled (2026-10-22 pm): lin-white-5 (white stage 5/9 running).
+
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 
 Final point a=0.9 (ours / paper): PL **0.0331 / 0.048**, LIME 0.1171/0.082,

@@ -195,6 +195,13 @@ Slots refilled (2026-10-22 pm): lin-white-5 (white stage 5/9 running).
   RIGID, failure in LIN, so this is consistent so far).
 
 Slots refilled (2026-10-22 pm): lin-white-6.
+* LIN WHITE a=0.1: same ordering, analytic family ranks 1-3 (AG
+  0.0279, AIG 0.0717, PL 0.0781), LIME 11th (0.1311), Laplace 12th /
+  Sobel 13th (0.1375/0.1387). White curve 0.1/0.2 now: AIG 0.0717 ->
+  0.0180, PL 0.0781 -> 0.0204, AG 0.0279 -> 0.0175, Laplace FLAT
+  (0.1375 both) - filters neither improve nor worsen on LIN white.
+
+Slots refilled (2026-10-22 pm): lin-white-7.
 
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 

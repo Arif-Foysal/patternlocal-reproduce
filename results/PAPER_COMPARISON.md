@@ -89,22 +89,24 @@ Reading:
   every LIN CORR point.
 * **Thesis headline: AIG wins LIN CORR outright at a=0.9** — rank 1/13 on
   both EMD (0.0149) and IME (0.0194), edging AG (0.0160/0.0309) and tying
-  PL on EMD (0.0149/0.0198). Path-integration denoises past the plain
-  gradient exactly where the family converges at high noise.
+  PL on EMD (0.0149/0.0198). Same outright win in LIN WHITE at a=0.4 and
+  a=0.5 (0.0154/0.0151, rank 1/13 both). Path-integration denoises past the
+  plain gradient exactly where the family converges at high noise — two
+  outright AIG wins on white background alone.
 
 ---------------------------------------------------------------
 ## LIN WHITE (white background) — a=0.1–0.4 complete, 0.5–0.9 in flight
 
 | method | a=0.1 | a=0.2 | a=0.3 | a=0.4 |
 |---|---|---|---|---|
-| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 |
-| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 |
-| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 |
-| gradient_shap | 0.1190 | 0.1018 | 0.1018 | — |
-| plain_ig | 0.1268 | 0.1052 | — | — |
-| lime | 0.1311 | 0.1286 | 0.1286 | 0.1276 |
-| laplace | 0.1375 | 0.1375 | 0.1375 | 0.1374 |
-| sobel | 0.1387 | 0.1382 | 0.1370 | — |
+| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 | 0.0151 |
+| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 | 0.0151 |
+| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 | 0.0151 |
+| gradient_shap | 0.1190 | 0.1018 | 0.1018 | — | 0.1053 |
+| plain_ig | 0.1268 | 0.1052 | — | — | 0.1053 |
+| lime | 0.1311 | 0.1286 | 0.1286 | 0.1276 | 0.1262 |
+| laplace | 0.1375 | 0.1375 | 0.1375 | 0.1374 | 0.1374 |
+| sobel | 0.1387 | 0.1382 | 0.1370 | — | — |
 
 Reading:
 * Analytic family ranks 1-3 at every completed point (a=0.1–0.4); AIG
@@ -144,6 +146,7 @@ Ranks among all 13 methods (EMD rank / IME rank):
 | WLIN 0.2 | 2/13, 2/13 | 3/13 | **1/13** | AG / AG |
 | WLIN 0.3 | 2/13, **1/13** | 3/13 | **1/13** | AG / AG |
 | WLIN 0.4 | **1/13**, **1/13** | 3/13 | **1/13** | AIG / AIG |
+| WLIN 0.5 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | RIGID 0.2 | **2/13**, 3/13 | 11/13 | **13/13** | Laplace |
 | RIGID 0.3 | **2/13**, 3/13 | 4/13 | **12/13** | Laplace |
 

@@ -202,6 +202,15 @@ Slots refilled (2026-10-22 pm): lin-white-6.
   (0.1375 both) - filters neither improve nor worsen on LIN white.
 
 Slots refilled (2026-10-22 pm): lin-white-7.
+* **LIN WHITE a=0.4: AIG rank 1/13 on BOTH EMD and IME** (0.0154 /
+  0.0298; AG tied 0.0154, PL 0.0155) - the second AIG outright win,
+  on white background. Convergence to near-exact recovery by a=0.4
+  (AIG/AG/PL all ~0.0154-0.0155, 8x below the field), Laplace flat
+  last (0.1374), Sobel 12th, LIME 8th (0.1276). LIN WHITE so far:
+  AIG 0.0717 -> 0.0180 -> 0.0154; AG fastest 0.0279 -> 0.0175 ->
+  0.0154. AIG<=PL at every LIN WHITE point.
+
+Slots refilled (2026-10-22 pm): lin-white-8.
 
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 

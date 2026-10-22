@@ -97,11 +97,11 @@ Reading:
 ---------------------------------------------------------------
 ## LIN WHITE (white background) — a=0.1–0.4 complete, 0.5–0.9 in flight
 
-| method | a=0.1 | a=0.2 | a=0.3 | a=0.4 | a=0.5 | a=0.6 | a=0.7 |
-|---|---|---|---|---|---|---|---|
-| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 | 0.0151 | 0.0149 | 0.0148 |
-| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 | 0.0151 | 0.0149 | 0.0148 |
-| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 | 0.0151 | 0.0149 | 0.0148 |
+| method | a=0.1 | a=0.2 | a=0.3 | a=0.4 | a=0.5 | a=0.6 | a=0.7 | a=0.8 | a=0.9 |
+|---|---|---|---|---|---|---|---|---|---|
+| analytical_grad | 0.0279 | 0.0175 | 0.0160 | 0.0154 | 0.0151 | 0.0149 | 0.0148 | — | 0.0147 |
+| analytical_ig | 0.0717 | 0.0180 | 0.0160 | 0.0154 | 0.0151 | 0.0149 | 0.0148 | — | 0.0147 |
+| patternlocal | 0.0781 | 0.0204 | 0.0164 | 0.0155 | 0.0151 | 0.0149 | 0.0148 | — | 0.0147 |
 | gradient_shap | 0.1190 | 0.1018 | 0.1018 | — | 0.1053 |
 | plain_ig | 0.1268 | 0.1052 | — | — | 0.1053 |
 | lime | 0.1311 | 0.1286 | 0.1286 | 0.1276 | 0.1262 |
@@ -109,14 +109,16 @@ Reading:
 | sobel | 0.1387 | 0.1382 | 0.1370 | — | — |
 
 Reading:
-* Analytic family ranks 1-3 at every completed point (a=0.1–0.7); AIG
-  <= PL throughout. **AIG outright win at a=0.4–0.7** (rank 1/13 both
-  metrics each time: 0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214,
-  0.0148/0.0191).
-* Laplace flat-last at ~0.137 across all alphas — filters do not recover
-  on white background at all (consistent with paper: filters fail in LIN).
+* Analytic family ranks 1-3 at every completed point (a=0.1–0.9); AIG
+  <= PL throughout. **AIG outright win at a=0.4–0.9** (rank 1/13 both
+  metrics: 0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214, 0.0148/0.0191,
+  0.0147/0.0161).
+* Laplace flat-last at ~0.137 across all alphas (rank 13 at a≤0.7,
+  improved to rank 6 at a=0.9: 0.1336) — filters do not recover on white
+  background (consistent with paper: filters fail in LIN).
 * CONVERGENCE: AIG 0.0717 -> 0.0180 -> 0.0160 -> 0.0154 -> 0.0151 -> 0.0149 ->
-  0.0148 (monotone, near-exact by a=0.4); LIME flat ~0.13 all along.
+  0.0148 -> 0.0147 (monotone, near-exact by a=0.4); LIME flat ~0.13 all
+  along. LIN WHITE table complete.
 
 ---------------------------------------------------------------
 ## Analytical-IG vs the field — rank summary (24 completed points)
@@ -150,6 +152,7 @@ Ranks among all 13 methods (EMD rank / IME rank):
 | WLIN 0.5 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | WLIN 0.6 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | WLIN 0.7 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
+| WLIN 0.9 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | RIGID 0.2 | **2/13**, 3/13 | 11/13 | **13/13** | Laplace |
 | RIGID 0.3 | **2/13**, 3/13 | 4/13 | **12/13** | Laplace |
 
@@ -184,10 +187,10 @@ data semantics. No low-alpha gradient-family collapse.
 ---------------------------------------------------------------
 ## Grid state
 
-Done (27): XOR corr complete; LIN corr complete; LIN white 0.1–0.7;
-RIGID corr 0.2–0.3.
-Running: lin-white 8–9; xor-white 1–3.
-Remaining: lin-white 0.8–0.9; xor-white 0.4–0.9; rigid-corr 0.4–0.9;
+Done (28): XOR corr complete; LIN corr complete; LIN white complete
+(0.1–0.9); RIGID corr 0.2–0.3.
+Running: lin-white 8; xor-white 1–4.
+Remaining: lin-white 0.8; xor-white 0.5–0.9; rigid-corr 0.4–0.9;
 rigid-white 0.7–0.9.
 
 ---------------------------------------------------------------

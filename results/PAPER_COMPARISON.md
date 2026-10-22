@@ -99,6 +99,42 @@ XOR CORR, ours vs paper, EMD, n_test=600:
 Slots refilled (2026-10-22 am): xor-corr-9 (completes XOR table) +
 lin-corr 4,5,6,7.
 
+## Analytical-IG vs the field (all 14 completed points, Clark data)
+
+Ranks among all 13 methods (EMD rank / IME rank):
+
+| scene a | AIG | PL | AG (analytical_grad) | best EMD / best IME |
+|---|---|---|---|---|
+| XOR 0.1 | 3/13, 3/13 | 12/13 | **1/13**, 1/13 | AG / AG |
+| XOR 0.2 | 4/13, 3/13 | 3/13 | 2/13 | Laplace / AG |
+| XOR 0.3 | 4/13, 2/13 | 2/13 | 3/13 | Laplace / AG |
+| XOR 0.4 | 4/13, 3/13 | 2/13 | 3/13 | Laplace / AG |
+| XOR 0.5 | 5/13, 2/13 | 2/13 | 3/13 | Laplace / AG |
+| XOR 0.6 | 5/13, 2/13 | 2/13 | 4/13 | Laplace / AG |
+| XOR 0.7 | 8/13, 2/13 | 2/13 | 4/13 | Laplace / AG |
+| XOR 0.8 | 8/13, 2/13 | 3/13 | 7/13 | Laplace / AG |
+| LIN 0.1 | 3/13, 3/13 | 8/13 | **1/13** | AG / Laplace |
+| LIN 0.2 | 3/13, 3/13 | 2/13 | **1/13** | AG / AG |
+| LIN 0.3 | 2/13, 3/13 | 3/13 | **1/13** | AG / AG |
+| RIGID 0.2 | **2/13**, 3/13 | 11/13 | **13/13** | Laplace |
+| RIGID 0.3 | **2/13**, 3/13 | 4/13 | **12/13** | Laplace |
+
+Findings:
+1. **AIG beats LIME on BOTH metrics at every completed point, and beats
+   PatternLocal on IME at 13 of 14 points** (only XOR a=0.4 goes to PL,
+   0.2741 vs 0.2499).
+2. **AIG is the robustness member of the covariance family:** in RIGID it
+   is #2 overall (behind only Laplace), while its sibling AG
+   (plain-gradient kernel) COLLAPSES to rank 12-13 of 13 - the IG path
+   integration is what keeps the covariance kernel informative under
+   translation/rotation. PL also weak in RIGID (11th at a=0.2).
+3. **AIG's weak spot is XOR high-alpha EMD:** it degrades 0.0719 (a=0.7)
+   -> 0.0912 (a=0.8) and falls below the vanilla-IG family (DL/GS ~0.050),
+   while still holding IME rank 2 (0.028). EMD-vs-IME trade-off to report.
+4. AG dominates EMD+IME in LIN (rank 1-2) and low-alpha XOR - the analytical
+   family (AG + AIG) owns the top of the field wherever supports are fixed;
+   in RIGID only AIG survives.
+
 1. **Magnitudes moved dramatically toward the paper.** Old generator was
    ~0.5-0.7x the paper everywhere; on Clark's data LIME hits the paper's
    XOR a=0.1 value nearly exactly (0.1368 vs 0.135), Laplace nails RIGID

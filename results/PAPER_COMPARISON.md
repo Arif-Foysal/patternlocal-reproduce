@@ -130,6 +130,12 @@ lin-corr 4,5,6,7; later lin-corr-8.
   CORR now MISSING ONLY a=0.8, 0.9 (a=0.1-0.7 complete): AIG EMD
   0.1245/0.1118/0.1024/0.0768/0.0532/0.0298/0.0198 - every step
   monotone, Laplace worsens 0.125/0.143/0.166/0.183/0.196/0.206/0.214.
+* **LIN CORR a=0.8: Laplace is now rank 13/13 - LAST of all methods**
+  (EMD 0.2203; Sobel 12th 0.1918; vanilla-IG family 11th ~0.161). The
+  analytic family at the top: AG 0.0158, AIG 0.0162 = PL 0.0162
+  (exact-tie EMD, IME 0.0314/0.0324). Filter-failure taxonomy hits
+  total inversion: the best filter in RIGID is the worst method in
+  LIN CORR. AIG<=PL everywhere in LIN still stands.
 
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 

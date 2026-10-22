@@ -1,0 +1,589 @@
+\documentclass[pdflatex,sn-mathphys-num]{sn-jnl}
+
+\usepackage{graphicx}%
+\usepackage{multirow}%
+\usepackage{amsmath,amssymb,amsfonts}%
+\usepackage{amsthm}%
+\usepackage{mathrsfs}%
+\usepackage[title]{appendix}%
+\usepackage{xcolor}%
+\usepackage{textcomp}%
+\usepackage{manyfoot}%
+\usepackage{booktabs}%
+\usepackage{algorithm}%
+\usepackage{algorithmicx}%
+\usepackage{algpseudocode}%
+\usepackage{listings}%
+
+\theoremstyle{thmstyleone}
+\newtheorem{theorem}{Theorem}
+\newtheorem{proposition}[theorem]{Proposition}
+
+\theoremstyle{thmstyletwo}%
+\newtheorem{example}{Example}%
+\newtheorem{remark}{Remark}%
+
+\theoremstyle{thmstylethree}%
+\newtheorem{definition}{Definition}%
+
+\raggedbottom
+
+\begin{document}
+
+\title[PatternGrad: A Local Explanation Method for Noise-Resilient Feature Attribution]{PatternGrad: A Local Explanation Method for Noise-Resilient Feature Attribution in Non-Linear Models}
+
+\author[1]{\fnm{Md Arif Faysal} \sur{Nayem}}
+
+\author*[1]{\fnm{Ohidujjaman} }\email{ohidujjaman@cse.uiu.ac.bd}
+
+
+
+\affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{United International University}, \orgaddress{\street{United City, Madani Avenue}, \city{Dhaka}, \postcode{1212}, \country{Bangladesh}}}
+
+
+\abstract{The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. Authors are advised to check the author instructions for the journal they are submitting to for word limits and if structural elements like subheadings, citations, or equations are permitted.}
+\keywords{Explainable AI, Keyword2, Keyword3, Keyword4}
+
+\maketitle
+
+\section{Introduction}\label{sec1}
+
+The Introduction section, of referenced text \cite{bib1} expands on the background of the work (some overlap with the Abstract is acceptable). The introduction should not include subheadings.
+
+Springer Nature does not impose a strict layout as standard however authors are advised to check the individual requirements for the journal they are planning to submit to as there may be journal-level preferences. When preparing your text please also be aware that some stylistic choices are not supported in full text XML (publication version), including coloured font. These will not be replicated in the typeset article if it is accepted. 
+\section{Conventional Methods}
+
+\subsection{Integrated Gradients (IG)}
+Standard gradient-based attribution methods quantify feature importance by computing the local partial derivatives of the model prediction $f(\mathbf{x}_\star)$ with respect to the input $\mathbf{x}_\star$. However, raw gradients frequently suffer from \emph{saturation}---where the model output flattens in the vicinity of $\mathbf{x}_\star$, yielding near-zero gradients even for features that strongly contribute to the prediction. To overcome this limitation, Integrated Gradients (IG)~\cite{sundararajan2017} attributes importance by accumulating gradients along a straight-line path from a chosen uninformative baseline $\mathbf{x}' \in \mathbb{R}^D$ (such as a zero vector) to the target instance $\mathbf{x}_\star$. Formally, the attribution score $s_i^{\text{IG}}(\mathbf{x}_\star)$ for the $i$-th feature is defined as:
+\begin{equation}
+    s_i^{\text{IG}}(\mathbf{x}_\star) = (x_{\star, i} - x'_i) \int_{0}^{1} \frac{\partial f(\mathbf{x}' + \gamma(\mathbf{x}_\star - \mathbf{x}'))}{\partial x_i} \, d\gamma,
+\end{equation}
+where $\gamma \in [0, 1]$ parameterizes the linear interpolation path between $\mathbf{x}'$ and $\mathbf{x}_\star$. By integrating gradients over the entire path rather than evaluating them solely at $\mathbf{x}_\star$, IG satisfies two fundamental axiomatic properties: \emph{Sensitivity} (guaranteeing non-zero attribution for any single feature that alters the prediction relative to the baseline) and \emph{Completeness}, where the attributions sum to the exact difference in model output, $\sum_{i=1}^D s_i^{\text{IG}}(\mathbf{x}_\star) = f(\mathbf{x}_\star) - f(\mathbf{x}')$. In practice, the path integral is efficiently approximated via a Riemann sum over $M$ discrete interpolation steps:
+\begin{equation}
+    \hat{s}_i^{\text{IG}}(\mathbf{x}_\star) = \frac{x_{\star, i} - x'_i}{M} \sum_{m=1}^{M} \frac{\partial f\left(\mathbf{x}' + \frac{m}{M}(\mathbf{x}_\star - \mathbf{x}')\right)}{\partial x_i}.
+    \label{eq:ig_riemann}
+\end{equation}
+
+
+\subsection{Local Interpretable Model-agnostic Explanations (LIME)}
+Local Interpretable Model-agnostic Explanations (LIME)~\cite{ribeiro2016} explains an individual prediction $f(\mathbf{x}_\star)$ by approximating the complex model $f$ locally around the target instance $\mathbf{x}_\star$ using an interpretable surrogate model $g \in G$. In its general form, the surrogate is obtained by minimizing $\mathcal{L}(f, g, \Pi_{\mathbf{x}'_\star}) + \Omega(g)$, where $\mathcal{L}$ measures local fidelity within a neighborhood weighted by the proximity kernel $\Pi_{\mathbf{x}'_\star}$, and $\Omega(g)$ penalizes surrogate complexity. 
+
+In standard practice, $g$ is parameterized as a linear model operating in a simplified representation space $\mathcal{Z} \subseteq \mathbb{R}^{D'}$, and $\mathcal{L}$ is defined as the squared loss~\cite{tan2023}. Let $h_{\mathbf{x}_\star}^{-1}: \mathcal{Z} \to \mathcal{X}$ denote the reconstruction mapping that projects a simplified perturbation $\mathbf{z}' \in \mathcal{Z}$ back into the original input space $\mathcal{X}$. LIME estimates the feature-importance vector $\mathbf{w}^{\text{LIME}}$ via kernel-weighted regularized linear regression:
+\begin{equation}
+    \mathbf{s}^{\text{LIME}}(\mathbf{x}_\star) = \mathbf{w}^{\text{LIME}} = \operatorname*{argmin}_{\mathbf{v}} \; \mathbb{E}_{\mathbf{z}' \sim \mathbb{P}_{\mathcal{Z}}} \left[ \Pi_{\mathbf{x}'_\star}(\mathbf{z}') \left( f(h_{\mathbf{x}_\star}^{-1}(\mathbf{z}')) - \mathbf{v}^\top \mathbf{z}' \right)^2 \right] + \lambda R(\mathbf{v}),
+\end{equation}
+where $R(\mathbf{v})$ is a regularization penalty weighted by $\lambda$. For image data, $\mathbf{z}' \sim \operatorname{Uni}(\{0, 1\}^{D'})$ represents a binary mask over $D'$ superpixels, $\Pi_{\mathbf{x}'_\star}(\mathbf{z}') = \exp(-\|\mathbf{1} - \mathbf{z}'\|_0^2 / \sigma^2)$ is an exponential locality kernel, and $R(\mathbf{v}) = \|\mathbf{v}\|_2^2$ corresponds to ridge regularization. Perturbed inputs are reconstructed via $h_{\mathbf{x}_\star}^{-1}(\mathbf{z}') = \mathbf{x}_\star \odot B(\mathbf{z}') + \mathbf{r} \odot (\mathbf{1} - B(\mathbf{z}'))$, where $B: \{0, 1\}^{D'} \to \{0, 1\}^D$ broadcasts each binary superpixel indicator $z'_j$ to its constituent pixels, $\odot$ denotes the element-wise product, and $\mathbf{r}$ is an uninformative reference baseline. Because $\mathbf{w}^{\text{LIME}}$ acts as a local discriminative filter to fit $f$, it remains susceptible to assigning non-zero importance to correlated suppressor variables~\cite{wilming2022}.
+
+
+\subsection{PatternLocal}
+Standard local linear explanation methods (such as LIME, KernelSHAP, and local gradients) approximate a complex model $f$ around an instance of interest $\mathbf{x}_\star$ using a linear surrogate weight vector $\mathbf{w}$. However, as discriminative filter parameters, $\mathbf{w}$ often assigns non-zero weights to suppressor variables in order to cancel out correlated background noise. To mitigate these false-positive attributions, PatternLocal~\cite{patternlocal_citation} converts the local surrogate weights $\mathbf{w}$ into a generative, data-driven \emph{pattern} $\mathbf{a}$ that reflects only statistically relevant signal features.
+
+Let $\mathbf{h}_{\mathbf{x}_\star}: \mathcal{X} \to \mathbb{R}^{D'}$ denote a simplified local input representation around $\mathbf{x}_\star$, and let $\tilde{y} = \mathbf{w}^\top \mathbf{h}_{\mathbf{x}_\star}(\mathbf{x})$ represent the corresponding local surrogate prediction. Rather than treating $\mathbf{w}$ directly as the explanation, PatternLocal estimates the attribution pattern $\mathbf{a}$ by regressing the local surrogate response $\tilde{y}$ back onto the simplified input features within a kernel-weighted neighborhood $\Pi_{\mathbf{x}'_\star}$:
+\begin{equation}
+    \mathbf{s}^{\text{PatternLocal}}(\mathbf{x}_\star) = \mathbf{a} = \operatorname*{argmin}_{\mathbf{u}} \; \mathbb{E}_{\mathbf{x} \sim \mathbb{P}_{\mathcal{X}}} \left[ \Pi_{\mathbf{x}'_\star}(\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x})) \left\| \mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}) - \mathbf{u}\tilde{y} \right\|_2^2 \right] + \lambda Q(\mathbf{u}),
+    \label{eq:pl_objective}
+\end{equation}
+where $Q(\mathbf{u})$ is a regularization penalty weighted by $\lambda$ to ensure estimation stability in high-dimensional or sparse neighborhoods. When $Q(\mathbf{u}) = \|\mathbf{u}\|_1$, the objective corresponds to a kernel-weighted Lasso regression. Under $\ell_2$ regularization ($Q(\mathbf{u}) = \|\mathbf{u}\|_2^2$), the problem reduces to kernel-weighted ridge regression and admits a closed-form solution:
+\begin{equation}
+    \mathbf{a}_{\ell_2} = \frac{\operatorname{Cov}_{\Pi_{\mathbf{x}'_\star}}[\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}), \tilde{y}]}{\operatorname{Var}_{\Pi_{\mathbf{x}'_\star}}[\tilde{y}] + \lambda}.
+    \label{eq:pl_closed}
+\end{equation}
+By expressing feature importance as the localized covariance between the input features and the surrogate output $\tilde{y}$ (rather than the true label $y$), PatternLocal preserves both model faithfulness and local fidelity while effectively driving the attribution of uncorrelated suppressor variables to zero.
+
+
+\section{Proposed Method}\label{sec4}
+
+\subsection{PatternGrad}
+
+The explanation quality of the pattern-conversion paradigm underlying PatternLocal~\cite{patternlocal_citation} rests on two estimators: (i) the local surrogate weights $\mathbf{w}$, which compress the behaviour of the model $f$ around the instance $\mathbf{x}_\star$ into a scalar response $\tilde{y}$, and (ii) the kernel-weighted neighborhood $\Pi$ over which the covariance between inputs and $\tilde{y}$ is accumulated. In LIME-driven PatternLocal, both estimators are contaminated by sampling error. The surrogate weights are obtained by Monte-Carlo regression over $N_{\mathcal{L}}$ perturbations of the input~\cite{ribeiro2016,tan2023}, with a variance that grows with the effective dimension of the simplified representation and shrinks only with the perturbation budget; moreover, for image data the surrogate operates on $D'$ superpixels rather than on pixels, so the resulting importance map is piecewise constant at a granularity coarser than the data itself. This error propagates through the covariance transform of Eq.~\eqref{eq:pl_closed} and is most harmful exactly where the pattern conversion is meant to help: suppressor variables are associated with the prediction target only through low-variance, noise-carrying directions of the input distribution~\cite{haufe2014,wilming2022}, where a noisy surrogate fit can spuriously latch.
+
+\emph{PatternGrad} removes the sampling stage of the surrogate entirely. The method retains the generative pattern conversion of PatternLocal but makes two substitutions: (1) the Monte-Carlo surrogate $\mathbf{w}^{\text{LIME}}$ is replaced by the analytical, axiomatic local weights of Integrated Gradients (IG), and (2) the perturbation-defined locality kernel is replaced by a kernel anchored on the empirical training distribution, estimated over the $K$ nearest training samples. The resulting estimator is deterministic given $(f, \mathbf{x}_\star, M, \mathcal{D}_{\text{train}})$, requires no mask sampling, no reconstruction of perturbed inputs, and no surrogate refitting, and reduces to a closed-form transformation whose only structural hyper-parameter is the neighborhood size $K$. Within the generalized local-explanation framework of Tan et al.~\cite{tan2023}, PatternGrad can thus be read as the member of the family whose surrogate is analytical and whose kernel lives on the data distribution rather than on the perturbation space.
+
+\subsubsection{Analytical surrogate via Integrated Gradients}
+
+PatternGrad instantiates the surrogate weight vector $\mathbf{w}^{\text{PG}}$ as the IG attribution vector of Sect.~\ref{sec1},
+\begin{equation}
+    \mathbf{w}^{\text{PG}} \mathrel{:=} \hat{\mathbf{s}}^{\text{IG}}(\mathbf{x}_\star),
+    \label{eq:pg_surrogate}
+\end{equation}
+computed by the $M$-step quadrature of Eq.~\eqref{eq:ig_riemann} along the straight-line path from the uninformative baseline $\mathbf{x}' = \mathbf{0}$ to $\mathbf{x}_\star$, where $f$ is taken as the logit of the predicted class. Three properties motivate this choice over a perturbation-regression surrogate. First, IG satisfies the axioms of \emph{sensitivity} and \emph{completeness}, and its path accumulation renders the attribution robust to the output saturation that plagues raw gradients~\cite{sundararajan2017}. Second, and central to the present design, $\mathbf{w}^{\text{PG}}$ is \emph{deterministic}: no stochastic perturbation of the input enters its computation, so the surrogate response carries zero Monte-Carlo variance (up to the deterministic quadrature error of the $M$-step sum). Third, the surrogate is computed directly in pixel space, $\mathbf{h}_{\mathbf{x}_\star} \equiv \mathrm{id}$ with $D' = D$, avoiding the superpixel discretization of mask-based surrogates, whose importance maps are piecewise constant over segments that may straddle the fine-grained ground-truth structures considered in Sect.~\ref{sec4}.
+
+\subsubsection{Covariance conversion on the training neighborhood}
+
+Rather than regressing $\tilde{y}$ on artificial binary masks drawn from the perturbation distribution, PatternGrad estimates the generative pattern of the surrogate statistic over the data distribution itself. For a given $\mathbf{x}_\star$, let $\mathcal{N}_K(\mathbf{x}_\star)$ denote the set of the $K$ nearest training samples under the Euclidean metric, and define the training-anchored locality kernel
+\begin{equation}
+    \pi_j = \frac{\mathbf{1}\!\left[j \in \mathcal{N}_K(\mathbf{x}_\star)\right] \, K_\sigma\!\left(\left\|\mathbf{x}^{(j)} - \mathbf{x}_\star\right\|_2\right)}{\sum_{\ell \in \mathcal{N}_K(\mathbf{x}_\star)} K_\sigma\!\left(\left\|\mathbf{x}^{(\ell)} - \mathbf{x}_\star\right\|_2\right)}, \qquad K_\sigma(d) = \exp\!\left(-\tfrac{1}{2}\left(\tfrac{d}{\sigma}\right)^{2}\right),
+    \label{eq:pg_kernel}
+\end{equation}
+whose bandwidth is estimated adaptively per instance as $\sigma \mathrel{:=} \operatorname{median}\{\Vert\mathbf{x}^{(j)} - \mathbf{x}_\star\Vert_2 : j \in \mathcal{N}_K(\mathbf{x}_\star)\}$, so that no bandwidth hyper-parameter is introduced. The surrogate response at a training point is $\tilde{y}^{(j)} = (\mathbf{w}^{\text{PG}})^\top \mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}^{(j)})$, and the attribution pattern is obtained by the kernel-weighted ridge regression of the inputs of the neighborhood onto this response:
+\begin{equation}
+    \mathbf{a} = \operatorname*{argmin}_{\mathbf{u}} \; \sum_{j \in \mathcal{N}_K(\mathbf{x}_\star)} \pi_j \left\| \mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}^{(j)}) - \mathbf{u}\, \tilde{y}^{(j)} \right\|_2^2 + \lambda \left\| \mathbf{u} \right\|_2^2.
+    \label{eq:pg_objective}
+\end{equation}
+This is the objective of PatternLocal (cf. Eq.~\eqref{eq:pl_objective}) with two substitutions: the response is generated by the analytical surrogate $\mathbf{w}^{\text{PG}}$, and the expectation over $\mathbb{P}_{\mathcal{X}}$ is anchored at $\mathbf{x}_\star$ by the training-data kernel of Eq.~\eqref{eq:pg_kernel}. Under $\ell_2$ regularization the problem is again solved in closed form,
+\begin{equation}
+    \mathbf{a} = \frac{\operatorname{Cov}_{\Pi^K_{\mathbf{x}_\star}}\!\left[\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}),\, \tilde{y}\right]}{\operatorname{Var}_{\Pi^K_{\mathbf{x}_\star}}[\tilde{y}] + \lambda} = \frac{\mathbf{C}_K\, \mathbf{w}^{\text{PG}}}{(\mathbf{w}^{\text{PG}})^\top \mathbf{C}_K \mathbf{w}^{\text{PG}} + \lambda},
+    \label{eq:pg_closed}
+\end{equation}
+where $\mathbf{C}_K \mathrel{:=} \sum_{j \in \mathcal{N}_K(\mathbf{x}_\star)} \pi_j \tilde{\mathbf{x}}^{(j)} \tilde{\mathbf{x}}^{(j)\top}$ denotes the kernel-weighted covariance of the centered neighborhood, $\tilde{\mathbf{x}}^{(j)} = \mathbf{x}^{(j)} - \boldsymbol{\mu}$, and $\boldsymbol{\mu} \mathrel{:=} \sum_j \pi_j \mathbf{x}^{(j)}$; the second identity holds with $\mathbf{h}_{\mathbf{x}_\star} \equiv \mathrm{id}$ by the bilinearity of the kernel-weighted covariance, since $\operatorname{Cov}[\mathbf{x}, \tilde{y}] = \sum_j \pi_j \tilde{\mathbf{x}}^{(j)} (\tilde{y}^{(j)} - \bar{\tilde{y}}) = \mathbf{C}_K \mathbf{w}^{\text{PG}}$ and $\operatorname{Var}[\tilde{y}] = (\mathbf{w}^{\text{PG}})^\top \mathbf{C}_K \mathbf{w}^{\text{PG}}$, where $\bar{\tilde{y}} \mathrel{:=} \sum_j \pi_j \tilde{y}^{(j)}$. PatternGrad thereby converts the discriminative IG filter into its Haufe-type generative pattern \cite{haufe2014} in closed form, localized on the data manifold. In practice $\mathbf{C}_K$ is never materialized: the product $\mathbf{C}_K \mathbf{w}^{\text{PG}}$ is evaluated as the two-pass matrix--vector expression $\tilde{\mathbf{X}}_K^\top \big(\boldsymbol{\pi} \odot (\tilde{\mathbf{X}}_K \mathbf{w}^{\text{PG}})\big)$ in $\mathcal{O}(KD)$, where $\tilde{\mathbf{X}}_K$ stacks the centered neighborhood. Moreover, because the resulting map is reported after magnitude normalization, the strictly positive scalar denominator affects only the scale of $\mathbf{a}$ and not its direction; $\lambda$ thus serves solely as a numerical ridge constant, leaving $K$ as the single structural hyper-parameter, which trades the locality bias of small neighborhoods against the sampling variance of the covariance estimate.
+
+\subsubsection{Properties}
+
+The attribution behavior of PatternGrad is governed by the kernel-weighted cross-covariance between the input features and the surrogate response, not by the internal form of the discriminative filter. The following statement formalizes how this suppresses features that are uninformative for the prediction target.
+
+\begin{proposition}[Suppressor suppression]\label{prop:suppression}
+Let $\mathcal{S} \subseteq \mathbb{R}^{D}$ denote the signal subspace of the local simplified representation and $P_{\mathcal{N}} = I - P_{\mathcal{S}}$ the orthogonal projector onto its complement. If the neighborhood data satisfy $\operatorname{Cov}_{\Pi^K_{\mathbf{x}_\star}}\!\left[P_{\mathcal{N}}\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}),\, \tilde{y}\right] = 0$, then $P_{\mathcal{N}}\mathbf{a} = \mathbf{0}$; i.e., PatternGrad assigns zero attribution to every direction whose kernel-weighted cross-covariance with the surrogate response vanishes, independently of the magnitude of the corresponding surrogate weights in $\mathbf{w}^{\text{PG}}$.
+\end{proposition}
+
+\begin{proof}
+The kernel-weighted covariance is linear in its first argument, so $\operatorname{Cov}[\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}), \tilde{y}] = \operatorname{Cov}[P_{\mathcal{S}}\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}), \tilde{y}] + \operatorname{Cov}[P_{\mathcal{N}}\mathbf{h}_{\mathbf{x}_\star}(\mathbf{x}), \tilde{y}]$, and the second term vanishes by assumption. Every point of the form $\sum_j \pi_j (P_{\mathcal{S}}\tilde{\mathbf{x}}^{(j)}) (\tilde{y}^{(j)} - \bar{\tilde{y}})$ lies in $\mathcal{S}$, hence the numerator of Eq.~\eqref{eq:pg_closed} belongs to $\mathcal{S}$. Since $((\mathbf{w}^{\text{PG}})^\top \mathbf{C}_K \mathbf{w}^{\text{PG}} + \lambda) > 0$ is a scalar, $P_{\mathcal{N}}\mathbf{a} = \mathbf{0}$.
+\end{proof}
+
+Proposition~\ref{prop:suppression} delineates the mechanism by which PatternGrad counteracts the suppressor vulnerability of discriminative attributions~\cite{haufe2014, wilming2022}. A local filter $\mathbf{w}$---whether fitted by LIME regression or obtained by backpropagation---is free to exploit background directions that cancel correlated noise in order to sharpen its prediction, and therefore $w_i \neq 0$ for suppressor features with $i \notin \mathcal{F}^+$. In the correlated-noise settings of the XAI-TRIS benchmark~\cite{clark2024}, spatially smoothed background noise renders clusters of background pixels such suppressors, and attribution maps that follow the filter blur importance off the ground-truth support. PatternGrad, in contrast, weights every surrogate component by its \emph{generative} concurrency with the input statistics of the local neighborhood: the coordinate $a_i$ is the estimated change of feature $i$ implied by a unit change of the surrogate response over the training distribution around $\mathbf{x}_\star$. Suppressor pixels co-activate with the noise corrupting the foreground and are thereby exploited by $f$, but their contribution to the data-level covariance of the response concentrates on directions that are not class-informative by construction, so their pattern coefficients are attenuated toward zero in the regime captured by Proposition~\ref{prop:suppression}.
+
+A second property concerns the population limit of the estimator, which isolates the role of the structural parameter $K$.
+
+\begin{proposition}[Consistency of the global limit]\label{prop:consistency}
+Fix $f$, $\mathbf{x}_\star$, the baseline $\mathbf{x}'$ and $M$, let $\lambda > 0$, and let the training samples be i.i.d. draws from $\mathbb{P}_{\mathcal{X}}$. In the global limit $K \to N$ with uniform weights $\pi_j = 1/N$ over the training set, the PatternGrad estimate converges in probability to
+\begin{equation}
+    \mathbf{a}^{\infty} = \frac{\boldsymbol{\Sigma}\, \mathbf{w}^{\text{PG}}}{(\mathbf{w}^{\text{PG}})^\top \boldsymbol{\Sigma}\, \mathbf{w}^{\text{PG}} + \lambda}, \qquad \boldsymbol{\Sigma} \mathrel{:=} \operatorname{Cov}_{\mathbb{P}_{\mathcal{X}}}[\mathbf{x}].
+    \label{eq:pg_limit}
+\end{equation}
+\end{proposition}
+
+\begin{proof}
+With uniform weights the estimator of Eq.~\eqref{eq:pg_closed} is a ratio of empirical covariance functionals. By the law of large numbers for i.i.d. samples, the kernel-weighted (here uniform) first and second moments converge in probability to their population analogues; the closed form of Eq.~\eqref{eq:pg_closed} is a continuous function of these moments on the domain $(\mathbf{w}^{\text{PG}})^\top \boldsymbol{\Sigma}\, \mathbf{w}^{\text{PG}} + \lambda > 0$, which holds by $\lambda > 0$. The result follows by the continuous mapping theorem.
+\end{proof}
+
+Proposition~\ref{prop:consistency} identifies the $K \to N$ extreme with the population Haufe conversion of the IG statistic; intermediate $K$ interpolates between this global pattern and a purely local covariance estimate around $\mathbf{x}_\star$, and is selected on validation data. The computational cost per instance is dominated by $M$ backward passes for the surrogate (no forward queries at perturbed inputs are required), a nearest-neighbor retrieval, and the $\mathcal{O}(KD)$ two-pass product of Eq.~\eqref{eq:pg_closed}; the attributable cost is therefore of the order of that of plain IG. In contrast to LIME, the estimator involves no seed-dependent randomness, no reconstruction of perturbed inputs, and no per-instance surrogate optimization problem. The price of these properties is the requirement of differentiable model access, as for any gradient-based method. Algorithm~\ref{algo:patterngrad} summarizes the procedure.
+
+\begin{algorithm}
+\caption{PatternGrad attribution}\label{algo:patterngrad}
+\begin{algorithmic}[1]
+\Require classifier $f$ (differentiable), instance $\mathbf{x}_\star \in \mathbb{R}^D$, baseline $\mathbf{x}' = \mathbf{0}$, training set $\mathcal{D}_{\text{train}} \in \mathbb{R}^{N \times D}$, number of quadrature steps $M$, neighborhood size $K$, ridge constant $\lambda$
+\Ensure attribution map $\mathbf{a} \in \mathbb{R}^D$
+\State $\mathbf{w} \leftarrow \tfrac{1}{M} \sum_{m=1}^{M} \nabla f\!\left(\tfrac{m}{M}\, \mathbf{x}_\star\right) \odot \mathbf{x}_\star$ \Comment{IG surrogate, Eq.~\eqref{eq:ig_riemann}}
+\State $\{\mathbf{x}^{(j)}\}_{j=1}^{K} \leftarrow$ $K$ nearest training samples of $\mathbf{x}_\star$
+\State $\sigma \leftarrow \operatorname{median}_{j \leq K} \left\| \mathbf{x}^{(j)} - \mathbf{x}_\star \right\|_2$ \Comment{adaptive bandwidth}
+\State $\boldsymbol{\pi} \leftarrow \left(\exp\!\left(-{\left\|\mathbf{x}^{(j)} - \mathbf{x}_\star\right\|_2^2}/({2\sigma^2})\right)\right)_{j=1}^{K} / \sum_{\ell=1}^{K} \exp\!\left(-{\left\|\mathbf{x}^{(\ell)} - \mathbf{x}_\star\right\|_2^2}/({2\sigma^2})\right)$ \Comment{Eq.~\eqref{eq:pg_kernel}}
+\State $\tilde{\mathbf{X}}_K \leftarrow (\mathbf{x}^{(j)} - \boldsymbol{\mu})_{j=1}^{K}$ with $\boldsymbol{\mu} = \sum_j \pi_j \mathbf{x}^{(j)}$; \; $\tilde{\mathbf{y}} \leftarrow \tilde{\mathbf{X}}_K \mathbf{w}$
+\State $\mathbf{v} \leftarrow \tilde{\mathbf{X}}_K^\top \big(\boldsymbol{\pi} \odot \tilde{\mathbf{y}}\big)$; \; $\nu \leftarrow \tilde{\mathbf{y}}^\top (\boldsymbol{\pi} \odot \tilde{\mathbf{y}}) + \lambda$ \Comment{Eq.~\eqref{eq:pg_closed} without forming $\mathbf{C}_K$}
+\State \Return $\mathbf{a} \leftarrow \mathbf{v} / \nu$
+\end{algorithmic}
+\end{algorithm}
+
+\section{Experiments}
+\subsection{Experimental Setup and Conditions}
+
+\subsection{Dataset}
+\subsubsection{XAI-TRIS Benchmark}
+The proposed method is evaluated on the synthetic XAI-TRIS benchmark dataset introduced by Clark et al.~\cite{clark2024}, which is specifically designed to audit explanation faithfulness in the presence of suppressor variables. For each scenario, the dataset consists of $N = 40{,}000$ grayscale images of size $64 \times 64$ ($D = 4{,}096$ features), denoted as $\mathcal{D} = \{(\mathbf{x}^{(n)}, y^{(n)})\}_{n=1}^N$, with binary class labels $y^{(n)} \sim \operatorname{Bernoulli}(1/2)$. Each sample $\mathbf{x}^{(n)} \in \mathbb{R}^D$ is constructed by additively combining a class-dependent foreground signal $\mathbf{a}^{(n)} \in \mathbb{R}^D$ (which defines the ground-truth explanation) with background noise $\boldsymbol{\eta}^{(n)} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_D)$:
+\begin{equation}
+    \mathbf{x}^{(n)} = \alpha \left( R^{(n)} \circ (H \circ \mathbf{a}^{(n)}) \right) + (1 - \alpha)(G \circ \boldsymbol{\eta}^{(n)}),
+\end{equation}
+where $\alpha \in [0, 1]$ controls the signal-to-noise ratio (SNR) after Frobenius-norm normalization of the signal and noise components. Here, $H: \mathbb{R}^D \to \mathbb{R}^D$ is a 2D Gaussian spatial smoothing filter ($\sigma_{\text{smooth}} = 1.5$, thresholded at $5\%$ of its maximum support) applied to blend the edges of the foreground pattern into the background, and $R^{(n)}$ represents a spatial transformation operator.
+
+Two distinct background noise configurations are evaluated, governed by the operator $G$:
+\begin{itemize}
+    \item \textbf{Uncorrelated Noise (WHITE):} $G$ is the identity operator, yielding standard independent Gaussian white noise.
+    \item \textbf{Correlated Noise (CORR):} $G: \mathbb{R}^D \to \mathbb{R}^D$ is a 2D Gaussian spatial filter with $\sigma_{\text{smooth}} = 10$. This spatial smoothing induces \emph{suppressor variables}, which are background pixels outside the foreground mask that carry no direct class information, but correlate with the noise corrupting the foreground signal~\cite{haufe2014, wilming2022}. Models can exploit these suppressor pixels to denoise the true signal, often causing XAI methods to falsely attribute importance to the background.
+\end{itemize}
+
+Across both noise settings, the foreground signal $\mathbf{a}^{(n)}$ is constructed using `T'-shaped ($\mathbf{a}^{\text{T}}$) and `L'-shaped ($\mathbf{a}^{\text{L}}$) tetrominoes across three classification scenarios:
+\begin{itemize}
+    \item \textbf{Linear (LIN):} $R^{(n)}$ is the identity operator. Class $y = 0$ is indicated by a `T'-shaped tetromino near the top-left corner, while $y = 1$ is indicated by an `L'-shaped tetromino near the bottom-right corner.
+    \item \textbf{Exclusive-OR (XOR):} $R^{(n)}$ is the identity operator, and both tetrominoes appear simultaneously in every image. For $y = 0$, the patterns share the same sign ($\mathbf{a}^{\text{T}} + \mathbf{a}^{\text{L}}$ or $-\mathbf{a}^{\text{T}} - \mathbf{a}^{\text{L}}$), whereas for $y = 1$, they have opposite signs ($\mathbf{a}^{\text{T}} - \mathbf{a}^{\text{L}}$ or $-\mathbf{a}^{\text{T}} + \mathbf{a}^{\text{L}}$).
+    \item \textbf{Rigid-Body Transformation (RIGID):} Following the class assignment of the LIN scenario, $R^{(n)}$ applies a random spatial translation and $90^\circ$-increment rotation to the tetrominoes, introducing position and orientation invariance.
+\end{itemize}
+
+Combining the three signal scenarios with the two noise settings yields six distinct evaluation benchmarks. The ground-truth feature mask $\mathcal{F}^+(\mathbf{x}^{(n)})$ comprises all pixels belonging to the active tetromino support. Notably, in the static LIN scenario, both the $\mathbf{a}^{\text{T}}$ and $\mathbf{a}^{\text{L}}$ regions constitute $\mathcal{F}^+$, as the absence of one shape is as informative as the presence of the other. For model training and evaluation, each dataset is partitioned into training ($\mathcal{D}_{\text{train}}$), validation ($\mathcal{D}_{\text{val}}$), and test ($\mathcal{D}_{\text{test}}$) subsets using a 90/5/5 split.
+
+
+\subsection{Experimental Procedure}
+\subsection{Parameter Configuration}
+
+
+\subsection{Evaluation Metrics}
+Explanation quality is evaluated by comparing the continuous attribution map $\mathbf{s}$ against the ground-truth feature mask $\mathcal{F}^+$ using two complementary metrics: Earth Mover's Distance (EMD) and Importance Mass Error (IME). Together, these metrics evaluate both the spatial distribution of attributions and the concentration of importance within ground-truth regions.
+
+\subsubsection{Earth Mover's Distance (EMD)}
+The EMD measures the minimum cost required to transform one probability distribution into another. By treating the normalized attribution map $|\mathbf{s}|$ and the normalized ground-truth mask $\mathcal{F}^+$ as distributions of equal mass, the optimal transport cost $\operatorname{OT}(|\mathbf{s}|, \mathcal{F}^+)$ is computed using the Euclidean distance between pixels as the ground metric, following the algorithm of Bonneel et al.~\cite{bonneel2011}. The normalized EMD is defined as:
+\begin{equation}
+    \operatorname{EMD} = \frac{\operatorname{OT}(|\mathbf{s}|, \mathcal{F}^+)}{\delta_{\max}},
+\end{equation}
+where $\delta_{\max}$ is the maximum Euclidean distance between any two pixels in the image.
+
+\subsubsection{Importance Mass Error (IME)}
+While the ground truth $\mathcal{F}^+$ contains the complete set of informative pixels defined by the data generation process, a trained model may legitimately rely on only a subset of these features for its prediction~\cite{clark2024, arras2022}. Consequently, a rigorous evaluation should penalize false-positive attributions in background regions while remaining forgiving of false-negative omissions within $\mathcal{F}^+$. To capture this, IME measures the fraction of total attribution magnitude falling outside the ground-truth region:
+\begin{equation}
+    \operatorname{IME} = 1 - \frac{\sum_{i=1}^{\operatorname{card}(\mathcal{F}^+)} |s_i|}{\sum_{i=1}^{\operatorname{card}(\mathbf{s})} |s_i|},
+\end{equation}
+where $\operatorname{card}(\mathcal{F}^+)$ and $\operatorname{card}(\mathbf{s})$ denote the number of pixels in the ground-truth subset and the full attribution map, respectively.
+
+\section{Results}\label{sec2}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\subsection{Statistical Analysis}
+
+
+\section{Tables}\label{sec5}
+
+Tables can be inserted via the normal table and tabular environment. To put
+footnotes inside tables you should use \verb+\footnotetext[]{...}+ tag.
+The footnote appears just below the table itself (refer Tables~\ref{tab1} and \ref{tab2}). 
+For the corresponding footnotemark use \verb+\footnotemark[...]+
+
+\begin{table}[h]
+\caption{Caption text}\label{tab1}%
+\begin{tabular}{@{}llll@{}}
+\toprule
+Column 1 & Column 2  & Column 3 & Column 4\\
+\midrule
+row 1    & data 1   & data 2  & data 3  \\
+row 2    & data 4   & data 5\footnotemark[1]  & data 6  \\
+row 3    & data 7   & data 8  & data 9\footnotemark[2]  \\
+\botrule
+\end{tabular}
+\footnotetext{Source: This is an example of table footnote. This is an example of table footnote.}
+\footnotetext[1]{Example for a first table footnote. This is an example of table footnote.}
+\footnotetext[2]{Example for a second table footnote. This is an example of table footnote.}
+\end{table}
+
+\noindent
+The input format for the above table is as follows:
+
+
+\bigskip
+\begin{verbatim}
+\begin{table}[<placement-specifier>]
+\caption{<table-caption>}\label{<table-label>}%
+\begin{tabular}{@{}llll@{}}
+\toprule
+Column 1 & Column 2 & Column 3 & Column 4\\
+\midrule
+row 1 & data 1 & data 2	 & data 3 \\
+row 2 & data 4 & data 5\footnotemark[1] & data 6 \\
+row 3 & data 7 & data 8	 & data 9\footnotemark[2]\\
+\botrule
+\end{tabular}
+\footnotetext{Source: This is an example of table footnote. 
+This is an example of table footnote.}
+\footnotetext[1]{Example for a first table footnote.
+This is an example of table footnote.}
+\footnotetext[2]{Example for a second table footnote. 
+This is an example of table footnote.}
+\end{table}
+\end{verbatim}
+\bigskip
+
+
+\begin{table}[h]
+\caption{Example of a lengthy table which is set to full textwidth}\label{tab2}
+\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccccc}
+\toprule%
+& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]} & \multicolumn{3}{@{}c@{}}{Element 2\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
+Project & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
+\midrule
+Element 3  & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$\\
+Element 4  & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$\\
+\botrule
+\end{tabular*}
+\footnotetext{Note: This is an example of table footnote. This is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
+\footnotetext[1]{Example for a first table footnote.}
+\footnotetext[2]{Example for a second table footnote.}
+\end{table}
+
+In case of double column layout, tables which do not fit in single column width should be set to full text width. For this, you need to use \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ instead of \verb+\begin{table}+ \verb+...+ \verb+\end{table}+ environment. Lengthy tables which do not fit in textwidth should be set as rotated table. For this, you need to use \verb+\begin{sidewaystable}+ \verb+...+ \verb+\end{sidewaystable}+ instead of \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ environment. This environment puts tables rotated to single column width. For tables rotated to double column width, use \verb+\begin{sidewaystable*}+ \verb+...+ \verb+\end{sidewaystable*}+.
+
+\begin{sidewaystable}
+\caption{Tables which are too long to fit, should be written using the ``sidewaystable'' environment as shown here}\label{tab3}
+\begin{tabular*}{\textheight}{@{\extracolsep\fill}lcccccc}
+\toprule%
+& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]}& \multicolumn{3}{@{}c@{}}{Element\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
+Projectile & Energy	& $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
+\midrule
+Element 3 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
+Element 4 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
+Element 5 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
+Element 6 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
+\botrule
+\end{tabular*}
+\footnotetext{Note: This is an example of table footnote this is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
+\footnotetext[1]{This is an example of table footnote.}
+\end{sidewaystable}
+
+\section{Figures}\label{sec6}
+
+As per the \LaTeX\ standards you need to use eps images for \LaTeX\ compilation and \verb+pdf/jpg/png+ images for \verb+PDFLaTeX+ compilation. This is one of the major difference between \LaTeX\ and \verb+PDFLaTeX+. Each image should be from a single input .eps/vector image file. Avoid using subfigures. The command for inserting images for \LaTeX\ and \verb+PDFLaTeX+ can be generalized. The package used to insert images in \verb+LaTeX/PDFLaTeX+ is the graphicx package. Figures can be inserted via the normal figure environment as shown in the below example:
+
+
+\bigskip
+\begin{verbatim}
+\begin{figure}[<placement-specifier>]
+\centering
+\includegraphics{<eps-file>}
+\caption{<figure-caption>}\label{<figure-label>}
+\end{figure}
+\end{verbatim}
+\bigskip
+
+
+% \begin{figure}[h]
+% \centering
+% \includegraphics[width=0.9\textwidth]{fig.eps}
+% \caption{This is a widefig. This is an example of long caption this is an example of long caption  this is an example of long caption this is an example of long caption}\label{fig1}
+% \end{figure}
+
+% Empty placeholder figure kept so the template's cross-reference examples resolve (fig1).
+\begin{figure}[h]
+\centering
+\fbox{\parbox[c][4cm][c]{0.9\textwidth}{\centering Placeholder -- real result figures to be inserted (see Results section).}}
+\caption{Placeholder figure caption.}\label{fig1}
+\end{figure}
+
+In case of double column layout, the above format puts figure captions/images to single column width. To get spanned images, we need to provide \verb+\begin{figure*}+ \verb+...+ \verb+\end{figure*}+.
+
+For sample purpose, we have included the width of images in the optional argument of \verb+\includegraphics+ tag. Please ignore this. 
+
+\section{Algorithms, Program codes and Listings}\label{sec7}
+
+Packages \verb+algorithm+, \verb+algorithmicx+ and \verb+algpseudocode+ are used for setting algorithms in \LaTeX\ using the format:
+
+
+\bigskip
+\begin{verbatim}
+\begin{algorithm}
+\caption{<alg-caption>}\label{<alg-label>}
+\begin{algorithmic}[1]
+. . .
+\end{algorithmic}
+\end{algorithm}
+\end{verbatim}
+\bigskip
+
+
+You may refer above listed package documentations for more details before setting \verb+algorithm+ environment. For program codes, the ``verbatim'' package is required and the command to be used is \verb+\begin{verbatim}+ \verb+...+ \verb+\end{verbatim}+. 
+
+Similarly, for \verb+listings+, use the \verb+listings+ package. \verb+\begin{lstlisting}+ \verb+...+ \verb+\end{lstlisting}+ is used to set environments similar to \verb+verbatim+ environment. Refer to the \verb+lstlisting+ package documentation for more details.
+
+A fast exponentiation procedure:
+
+\lstset{texcl=true,basicstyle=\small\sf,commentstyle=\small\rm,mathescape=true,escapeinside={(*}{*)}}
+\begin{lstlisting}
+begin
+  for $i:=1$ to $10$ step $1$ do
+      expt($2,i$);  
+      newline() od                (*\textrm{Comments will be set flush to the right margin}*)
+where
+proc expt($x,n$) $\equiv$
+  $z:=1$;
+  do if $n=0$ then exit fi;
+     do if odd($n$) then exit fi;                 
+        comment: (*\textrm{This is a comment statement;}*)
+        $n:=n/2$; $x:=x*x$ od;
+     { $n>0$ };
+     $n:=n-1$; $z:=z*x$ od;
+  print($z$). 
+end
+\end{lstlisting}
+
+\begin{algorithm}
+\caption{Calculate $y = x^n$}\label{algo1}
+\begin{algorithmic}[1]
+\Require $n \geq 0 \vee x \neq 0$
+\Ensure $y = x^n$ 
+\State $y \Leftarrow 1$
+\If{$n < 0$}\label{algln2}
+        \State $X \Leftarrow 1 / x$
+        \State $N \Leftarrow -n$
+\Else
+        \State $X \Leftarrow x$
+        \State $N \Leftarrow n$
+\EndIf
+\While{$N \neq 0$}
+        \If{$N$ is even}
+            \State $X \Leftarrow X \times X$
+            \State $N \Leftarrow N / 2$
+        \Else[$N$ is odd]
+            \State $y \Leftarrow y \times X$
+            \State $N \Leftarrow N - 1$
+        \EndIf
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+
+\bigskip
+\begin{minipage}{\hsize}%
+\lstset{frame=single,framexleftmargin=-1pt,framexrightmargin=-17pt,framesep=12pt,linewidth=0.98\textwidth,language=pascal}
+\begin{lstlisting}
+for i:=maxint to 0 do
+begin
+{ do nothing }
+end;
+Write('Case insensitive ');
+Write('Pascal keywords.');
+\end{lstlisting}
+\end{minipage}
+
+\section{Cross referencing}\label{sec8}
+
+Environments such as figure, table, equation and align can have a label
+declared via the \verb+\label{#label}+ command. For figures and table
+environments use the \verb+\label{}+ command inside or just
+below the \verb+\caption{}+ command. You can then use the
+\verb+\ref{#label}+ command to cross-reference them. As an example, consider
+the label declared for Figure~\ref{fig1} which is
+\verb+\label{fig1}+. To cross-reference it, use the command 
+\verb+Figure \ref{fig1}+, for which it comes up as
+``Figure~\ref{fig1}''. 
+
+To reference line numbers in an algorithm, consider the label declared for the line number 2 of Algorithm~\ref{algo1} is \verb+\label{algln2}+. To cross-reference it, use the command \verb+\ref{algln2}+ for which it comes up as line~\ref{algln2} of Algorithm~\ref{algo1}.
+
+\subsection{Details on reference citations}\label{subsec7}
+
+Standard \LaTeX\ permits only numerical citations. To support both numerical and author-year citations this template uses \verb+natbib+ \LaTeX\ package. For style guidance please refer to the template user manual.
+
+Here is an example for \verb+\cite{...}+: \cite{bib1}. Another example for \verb+\citep{...}+: \citep{bib2}. For author-year citation mode, \verb+\cite{...}+ prints Jones et al. (1990) and \verb+\citep{...}+ prints (Jones et al., 1990).
+
+All cited bib entries are printed at the end of this article: \cite{bib3}, \cite{bib4}, \cite{bib5}, \cite{bib6}, \cite{bib7}, \cite{bib8}, \cite{bib9}, \cite{bib10}, \cite{bib11}, \cite{bib12} and \cite{bib13}.
+
+\section{Examples for theorem like environments}\label{sec10}
+
+For theorem like environments, we require \verb+amsthm+ package. There are three types of predefined theorem styles exists---\verb+thmstyleone+, \verb+thmstyletwo+ and \verb+thmstylethree+ 
+
+
+\bigskip
+\begin{tabular}{|l|p{19pc}|}
+\hline
+\verb+thmstyleone+ & Numbered, theorem head in bold font and theorem text in italic style \\\hline
+\verb+thmstyletwo+ & Numbered, theorem head in roman font and theorem text in italic style \\\hline
+\verb+thmstylethree+ & Numbered, theorem head in bold font and theorem text in roman style \\\hline
+\end{tabular}
+\bigskip
+
+
+For mathematics journals, theorem styles can be included as shown in the following examples:
+
+\begin{theorem}[Theorem subhead]\label{thm1}
+Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
+Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
+Example theorem text. 
+\end{theorem}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\begin{proposition}
+Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
+Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
+\end{proposition}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\begin{example}
+Phasellus adipiscing semper elit. Proin fermentum massa
+ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
+at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
+\end{example}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\begin{remark}
+Phasellus adipiscing semper elit. Proin fermentum massa
+ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
+at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
+\end{remark}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\begin{definition}[Definition sub head]
+Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. 
+\end{definition}
+
+Additionally a predefined ``proof'' environment is available: \verb+\begin{proof}+ \verb+...+ \verb+\end{proof}+. This prints a ``Proof'' head in italic font style and the ``body text'' in roman font style with an open square at the end of each proof environment. 
+
+\begin{proof}
+Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
+\end{proof}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+
+\begin{proof}[Proof of Theorem~{\upshape\ref{thm1}}]
+Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
+\end{proof}
+
+\noindent
+For a quote environment, use \verb+\begin{quote}...\end{quote}+
+\begin{quote}
+Quoted text example. Aliquam porttitor quam a lacus. Praesent vel arcu ut tortor cursus volutpat. In vitae pede quis diam bibendum placerat. Fusce elementum
+convallis neque. Sed dolor orci, scelerisque ac, dapibus nec, ultricies ut, mi. Duis nec dui quis leo sagittis commodo.
+\end{quote}
+
+Sample body text. Sample body text. Sample body text. Sample body text. Sample body text (refer Figure~\ref{fig1}). Sample body text. Sample body text. Sample body text (refer Table~\ref{tab3}). 
+
+
+\section{Conclusion}\label{sec13}
+
+
+\backmatter
+
+\bmhead{Supplementary information}
+
+If your article has accompanying supplementary file/s please state so here. 
+
+Authors reporting data from electrophoretic gels and blots should supply the full unprocessed scans for key as part of their Supplementary information. This may be requested by the editorial team/s if it is missing.
+
+Please refer to Journal-level guidance for any specific requirements.
+
+\bmhead{Acknowledgements}
+
+Acknowledgements are not compulsory. Where included they should be brief. Grant or contribution numbers may be acknowledged.
+
+Please refer to Journal-level guidance for any specific requirements.
+
+\section*{Declarations}
+
+Some journals require declarations to be submitted in a standardised format. Please check the Instructions for Authors of the journal to which you are submitting to see if you need to complete this section. If yes, your manuscript must contain the following sections under the heading `Declarations':
+
+\begin{itemize}
+\item Funding
+\item Conflict of interest/Competing interests (check journal-specific guidelines for which heading to use)
+\item Ethics approval and consent to participate
+\item Consent for publication
+\item Data availability 
+\item Materials availability
+\item Code availability 
+\item Author contribution
+\end{itemize}
+
+\noindent
+If any of the sections are not relevant to your manuscript, please include the heading and write `Not applicable' for that section. 
+
+
+\bigskip
+\begin{flushleft}%
+Editorial Policies for:
+
+\bigskip\noindent
+Springer journals and proceedings: \url{https://www.springer.com/gp/editorial-policies}
+
+\bigskip\noindent
+Nature Portfolio journals: \url{https://www.nature.com/nature-research/editorial-policies}
+
+\bigskip\noindent
+\textit{Scientific Reports}: \url{https://www.nature.com/srep/journal-policies/editorial-policies}
+
+\bigskip\noindent
+BMC journals: \url{https://www.biomedcentral.com/getpublished/editorial-policies}
+\end{flushleft}
+
+\begin{appendices}
+
+\section{Section title of first appendix}\label{secA1}
+
+An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
+\end{appendices}
+
+\bibliography{sn-bibliography}
+\end{document}

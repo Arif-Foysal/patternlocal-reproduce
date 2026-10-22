@@ -120,8 +120,8 @@
     "pushed_at": "2026-10-18T13:04:37.833928"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-9": {
-    "notebook": "templates/xor_evaluation/xor_corr_sweep/xor_corr_sweep_9.py",
-    "pushed_at": "2026-10-20T10:29:13.828999"
+    "notebook": "notebooks/xor_corr_sweep_9.py",
+    "pushed_at": "2026-10-22T07:04:23.578493"
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-5": {
     "notebook": "notebooks/rigid_white_sweep_5.py",
@@ -202,5 +202,21 @@
   "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-3": {
     "notebook": "notebooks/lin_corr_sweep_3.py",
     "pushed_at": "2026-10-21T23:51:28.869533"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-4": {
+    "notebook": "notebooks/lin_corr_sweep_4.py",
+    "pushed_at": "2026-10-22T07:04:26.264508"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-5": {
+    "notebook": "notebooks/lin_corr_sweep_5.py",
+    "pushed_at": "2026-10-22T07:04:29.338700"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-6": {
+    "notebook": "notebooks/lin_corr_sweep_6.py",
+    "pushed_at": "2026-10-22T07:04:32.385167"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-7": {
+    "notebook": "notebooks/lin_corr_sweep_7.py",
+    "pushed_at": "2026-10-22T07:04:35.648587"
   }
 }

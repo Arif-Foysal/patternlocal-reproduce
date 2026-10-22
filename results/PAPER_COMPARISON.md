@@ -71,7 +71,33 @@ XOR CORR, ours vs paper, EMD, n_test=600:
   runner-up (beats every surf/non-spec method), PL 0.2759 vs LIME 0.3093
   (PL beats LIME but less than paper's 0.18-vs-0.26 gap).
 
-Slots after this batch (all 5 refilled): xor-corr 7,8 + lin-corr 1,2,3.
+## Reading 3 (2026-10-22, XOR CORR complete to a=0.8 — headline REPRODUCED)
+
+| a | PL ours / paper | IME PL / LIME (ours) |
+|---|---|---|
+| 0.7 | **0.0397 / 0.045** | 0.0511 / 0.6912 |
+| 0.8 | **0.0440 / 0.045** | 0.0290 / 0.6828 |
+
+* **PatternLocal vs paper full XOR curve now: 0.138/0.110/0.0664/0.0545/
+  0.0415/0.0406/0.0397/0.0440 (ours, a=0.1..0.8) vs paper 0.100/0.085/0.065/
+  0.058/0.050/0.043/0.045/0.045. From a=0.3 onward deltas 0.001-0.009 - the
+  paper's floor plateau (0.043-0.048) is fully reproduced.**
+* IME false-positive collapse total and monotone: PL 0.735 (a=0.1) ->
+  0.029 (a=0.8) vs LIME flat 0.68-0.78. AIG identical story (0.049/0.028);
+  AIG EMD degrades a bit at high a (0.091 at 0.8).
+* Honest caveats (persisting): Laplace (0.0208/0.0179) and Sobel
+  (0.0419/0.0308) KEEP DECLINING where the paper flattens (0.075/0.122) -
+  so at high alpha our filters are still better than the paper reports,
+  and PL is not uniquely #1 in our run (Laplace/Sobel below it). The
+  gradient family (plain_ig/DL/GS ~0.049-0.070) continues to decline
+  gently past the paper's 0.075-0.090 plateau but stays above the floor.
+* LIN CORR (no paper table; paper text says filters fail in LIN): with
+  CORR noise Laplace WORSENS with alpha (0.1254 -> 0.1660 at a=0.3) while
+  PL 0.1063 and analytical_grad 0.0444 excel - qualitatively the opposite
+  of RIGID, consistent with the paper's filter-success taxonomy.
+
+Slots refilled (2026-10-22 am): xor-corr-9 (completes XOR table) +
+lin-corr 4,5,6,7.
 
 1. **Magnitudes moved dramatically toward the paper.** Old generator was
    ~0.5-0.7x the paper everywhere; on Clark's data LIME hits the paper's

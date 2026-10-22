@@ -119,6 +119,12 @@ lin-corr 4,5,6,7; later lin-corr-8.
   Vanilla IG family stuck at 0.14, LIME flat 0.12.
 * LIN a=0.6 confirms convergence onset: AIG 0.0298 = PL 0.0297,
   AG 0.0242 best; Laplace 0.2057 fails, LIME flat 0.1248.
+* LIN a=0.5 (gap point): AIG 0.0532 = PL 0.0526 (tied again),
+  AG 0.0263; Laplace 0.1957, LIME 0.1271. LIN CORR trajectory now
+  0.1-0.3+0.5-0.7 complete and smooth: AIG EMD 0.1245 -> 0.1118 ->
+  0.1024 -> 0.0532 -> 0.0298 -> 0.0198; Laplace monotone-worsens
+  0.1254 -> 0.2138 every step. AIG<=PL on both metrics at every LIN
+  point so far. Only a=0.4, 0.8, 0.9 missing (all in flight).
 
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 

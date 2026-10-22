@@ -125,6 +125,11 @@ lin-corr 4,5,6,7; later lin-corr-8.
   0.1024 -> 0.0532 -> 0.0298 -> 0.0198; Laplace monotone-worsens
   0.1254 -> 0.2138 every step. AIG<=PL on both metrics at every LIN
   point so far. Only a=0.4, 0.8, 0.9 missing (all in flight).
+* LIN a=0.4 fills the gap: AIG 0.0768 < PL 0.0785 -> AIG BEATS PL on
+  EMD at this point (rank 2/13 both metrics; AG #1 at 0.0348). LIN
+  CORR now MISSING ONLY a=0.8, 0.9 (a=0.1-0.7 complete): AIG EMD
+  0.1245/0.1118/0.1024/0.0768/0.0532/0.0298/0.0198 - every step
+  monotone, Laplace worsens 0.125/0.143/0.166/0.183/0.196/0.206/0.214.
 
 ## Reading 4 (2026-10-22): XOR CORR TABLE COMPLETE (a=0.1-0.9)
 

@@ -148,6 +148,29 @@ Reading:
   recover on white XOR either.
 
 ---------------------------------------------------------------
+## RIGID CORR — a=0.4–0.8 added (a=0.9 running)
+
+| method | a=0.4 | a=0.5 | a=0.6 | a=0.7 | a=0.8 |
+|---|---|---|---|---|---|
+| laplace | **0.0825** (r1) | **0.0608** (r1) | **0.0445** (r1) | **0.0318** (r1) | **0.0218** (r1) |
+| analytical_ig | **0.1805** (r2) | **0.1449** (r2) | **0.1333** (r2) | 0.1151 (r4) | **0.0566** (r2) |
+| patternlocal | 0.2444 (r4) | 0.2181 (r5) | 0.1869 (r5) | 0.1231 (r5) | 0.0623 (r4) |
+| analytical_grad | 0.2572 (r6) | 0.2160 (r4) | 0.1786 (r4) | 0.1042 (r3) | 0.0617 (r3) |
+| sobel | — | — | 0.1350 (r3) | 0.1022 (r2) | 0.0693 (r5) |
+| lime | 0.3015 | 0.2984 | 0.2931 (r13) | 0.2897 (r13) | 0.2878 (r10) |
+
+IME (AIG rank): a=0.4 0.7843 (r3), a=0.5 0.7701 (r8), a=0.6 0.6888 (r7), a=0.7 0.5439 (r3), a=0.8 0.4608 (r4).
+Laplace is IME #1 at a=0.6–0.8 (0.290, 0.258, 0.233).
+
+Reading:
+* **Laplace is EMD #1 at every RIGID CORR point** (0.083 -> 0.022) — the filter
+  success the paper reports for RIGID; it keeps improving with alpha.
+* **AIG is EMD #2 at 0.2, 0.3, 0.4, 0.5, 0.6, 0.8** (rank 4 only at 0.7). It is the
+  only non-filter method that stays in the top two across the RIGID curve.
+* PL falls to rank 4–5 from a=0.4 on; AG collapses to rank 4–6 at a≤0.6.
+  Both sit well above AIG (0.18 vs 0.24 at a=0.4; 0.13 vs 0.19 at a=0.6).
+* LIME is rank 10–13 from a=0.6 on (flat ~0.29, the paper's pattern for LIME in RIGID).
+
 ## Analytical-IG vs the field — rank summary (35 completed points)
 
 Ranks among all 13 methods (EMD rank / IME rank):

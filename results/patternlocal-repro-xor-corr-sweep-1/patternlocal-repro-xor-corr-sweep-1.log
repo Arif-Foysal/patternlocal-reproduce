@@ -1,0 +1,98 @@
+[{"stream_name":"stdout","time":23.201220535,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":23.201274235,"data":"XOR CORR SNR sweep part 1: alpha = 0.1\n"}
+,{"stream_name":"stdout","time":23.201279465,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":23.201283345,"data":"\n"}
+,{"stream_name":"stdout","time":23.201286755,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":23.201289875,"data":"XOR CORR alpha=0.1\n"}
+,{"stream_name":"stdout","time":23.201292615,"data":"============================================================\n"}
+,{"stream_name":"stdout","time":35.536578439,"data":"Data:  /kaggle/input/patternlocal-repro-phase2-clark-xor-corr/xai_tris_data/XOR_CORR_alpha0.1.npz\n"}
+,{"stream_name":"stdout","time":35.536606459,"data":"Model: /kaggle/input/patternlocal-repro-phase2-clark-xor-corr/xai_tris_data/XOR_CORR_alpha0.1_model.pt\n"}
+,{"stream_name":"stderr","time":103.928222758,"data":"/usr/local/lib/python3.13/dist-packages/ot/datasets.py:204: SyntaxWarning: invalid escape sequence '\\d'\n"}
+,{"stream_name":"stderr","time":103.928258478,"data":"  positive floating numbers corresponding to the isotropic variances in the principal subspace, for the source and target distributions, respectively. The same as \\delta in :ref:`[1] \u003creferences-make_gauss-hd\u003e`, Proposition 2.2\n"}
+,{"stream_name":"stdout","time":160.406089451,"data":"  tune LIME bw= 10.0 -\u003e EMD 0.1392\n"}
+,{"stream_name":"stdout","time":226.831994322,"data":"  tune LIME bw= 20.0 -\u003e EMD 0.1393\n"}
+,{"stream_name":"stdout","time":294.153166527,"data":"  tune LIME bw= 30.0 -\u003e EMD 0.1394\n"}
+,{"stream_name":"stdout","time":294.153208277,"data":"  chosen LIME bandwidth: 10.0\n"}
+,{"stream_name":"stdout","time":382.033203369,"data":"  tune PatternLocal k_ratio=0.05 -\u003e EMD 0.1425\n"}
+,{"stream_name":"stdout","time":448.320411093,"data":"  tune PatternLocal k_ratio=0.5 -\u003e EMD 0.1462\n"}
+,{"stream_name":"stdout","time":515.549740941,"data":"  tune PatternLocal k_ratio=1.0 -\u003e EMD 0.1488\n"}
+,{"stream_name":"stdout","time":515.549809761,"data":"  chosen PatternLocal k_ratio: 0.05\n"}
+,{"stream_name":"stdout","time":515.549818921,"data":"  analytical k-grid (floor 1800 from pat_k_ratio=0.05): [1800, 5000, 10000, 20000, 36000]\n"}
+,{"stream_name":"stdout","time":573.424639931,"data":"  tune analytical-grad k=1800 -\u003e EMD 0.1008\n"}
+,{"stream_name":"stdout","time":632.508117194,"data":"  tune analytical-grad k=5000 -\u003e EMD 0.1036\n"}
+,{"stream_name":"stdout","time":694.938037214,"data":"  tune analytical-grad k=10000 -\u003e EMD 0.1077\n"}
+,{"stream_name":"stdout","time":752.076154194,"data":"  tune analytical-grad k=20000 -\u003e EMD 0.1142\n"}
+,{"stream_name":"stdout","time":807.18893901,"data":"  tune analytical-grad k=36000 -\u003e EMD 0.1253\n"}
+,{"stream_name":"stdout","time":876.243069221,"data":"  tune analytical-IG  k=1800 -\u003e EMD 0.1051\n"}
+,{"stream_name":"stdout","time":941.08125281,"data":"  tune analytical-IG  k=5000 -\u003e EMD 0.1058\n"}
+,{"stream_name":"stdout","time":1005.28625405,"data":"  tune analytical-IG  k=10000 -\u003e EMD 0.1075\n"}
+,{"stream_name":"stdout","time":1071.754593032,"data":"  tune analytical-IG  k=20000 -\u003e EMD 0.1096\n"}
+,{"stream_name":"stdout","time":1140.102668414,"data":"  tune analytical-IG  k=36000 -\u003e EMD 0.1129\n"}
+,{"stream_name":"stdout","time":1140.102715694,"data":"  chosen k_grad=1800  k_ig=1800\n"}
+,{"stream_name":"stdout","time":1140.102720544,"data":"\n"}
+,{"stream_name":"stdout","time":1140.102725934,"data":"--- Final evaluation ---\n"}
+,{"stream_name":"stdout","time":15187.25633739,"data":"  Saved sample images + npz: /kaggle/working/alpha0.1_sample_images.npz\n"}
+,{"stream_name":"stdout","time":15187.282058518,"data":"  lime             EMD 0.1368 IME 0.7813\n"}
+,{"stream_name":"stdout","time":15187.282090758,"data":"  patternlocal     EMD 0.1379 IME 0.7347\n"}
+,{"stream_name":"stdout","time":15187.282095738,"data":"  analytical_grad  EMD 0.0953 IME 0.5635\n"}
+,{"stream_name":"stdout","time":15187.282100168,"data":"  analytical_ig    EMD 0.1035 IME 0.6208\n"}
+,{"stream_name":"stdout","time":15187.282104078,"data":"  plain_grad       EMD 0.1114 IME 0.6923\n"}
+,{"stream_name":"stdout","time":15187.282108148,"data":"  plain_ig         EMD 0.1376 IME 0.7226\n"}
+,{"stream_name":"stdout","time":15187.282112388,"data":"  plain_smoothgrad EMD 0.1113 IME 0.6917\n"}
+,{"stream_name":"stdout","time":15187.282116448,"data":"  saliency         EMD 0.1114 IME 0.6923\n"}
+,{"stream_name":"stdout","time":15187.282120568,"data":"  deeplift         EMD 0.1348 IME 0.7136\n"}
+,{"stream_name":"stdout","time":15187.282124508,"data":"  gradient_shap    EMD 0.1386 IME 0.7268\n"}
+,{"stream_name":"stdout","time":15187.282128428,"data":"  guided_backprop  EMD 0.1124 IME 0.6973\n"}
+,{"stream_name":"stdout","time":15187.282132378,"data":"  sobel            EMD 0.1364 IME 0.7427\n"}
+,{"stream_name":"stdout","time":15187.282136398,"data":"  laplace          EMD 0.1025 IME 0.5969\n"}
+,{"stream_name":"stdout","time":15187.282140508,"data":"[RESULT] alpha0.1_test_acc: 1.0000\n"}
+,{"stream_name":"stdout","time":15187.282144938,"data":"[RESULT] alpha0.1_lime_emd: 0.1368\n"}
+,{"stream_name":"stdout","time":15187.282149478,"data":"[RESULT] alpha0.1_lime_ime: 0.7813\n"}
+,{"stream_name":"stdout","time":15187.282154028,"data":"[RESULT] alpha0.1_lime_sec_per_sample: 0.0000\n"}
+,{"stream_name":"stdout","time":15187.282158878,"data":"[RESULT] alpha0.1_patternlocal_emd: 0.1379\n"}
+,{"stream_name":"stdout","time":15187.282163788,"data":"[RESULT] alpha0.1_patternlocal_ime: 0.7347\n"}
+,{"stream_name":"stdout","time":15187.282168328,"data":"[RESULT] alpha0.1_patternlocal_sec_per_sample: 0.4044\n"}
+,{"stream_name":"stdout","time":15187.282172648,"data":"[RESULT] alpha0.1_analytical_grad_emd: 0.0953\n"}
+,{"stream_name":"stdout","time":15187.282177058,"data":"[RESULT] alpha0.1_analytical_grad_ime: 0.5635\n"}
+,{"stream_name":"stdout","time":15187.282181048,"data":"[RESULT] alpha0.1_analytical_grad_sec_per_sample: 0.0083\n"}
+,{"stream_name":"stdout","time":15187.282185078,"data":"[RESULT] alpha0.1_analytical_ig_emd: 0.1035\n"}
+,{"stream_name":"stdout","time":15187.282189058,"data":"[RESULT] alpha0.1_analytical_ig_ime: 0.6208\n"}
+,{"stream_name":"stdout","time":15187.282193038,"data":"[RESULT] alpha0.1_analytical_ig_sec_per_sample: 0.0068\n"}
+,{"stream_name":"stdout","time":15187.282197588,"data":"[RESULT] alpha0.1_plain_grad_emd: 0.1114\n"}
+,{"stream_name":"stdout","time":15187.282201858,"data":"[RESULT] alpha0.1_plain_grad_ime: 0.6923\n"}
+,{"stream_name":"stdout","time":15187.282206498,"data":"[RESULT] alpha0.1_plain_grad_sec_per_sample: 0.0048\n"}
+,{"stream_name":"stdout","time":15187.282209288,"data":"[RESULT] alpha0.1_plain_ig_emd: 0.1376\n"}
+,{"stream_name":"stdout","time":15187.282211998,"data":"[RESULT] alpha0.1_plain_ig_ime: 0.7226\n"}
+,{"stream_name":"stdout","time":15187.282214718,"data":"[RESULT] alpha0.1_plain_ig_sec_per_sample: 0.1005\n"}
+,{"stream_name":"stdout","time":15187.282217448,"data":"[RESULT] alpha0.1_plain_smoothgrad_emd: 0.1113\n"}
+,{"stream_name":"stdout","time":15187.282220368,"data":"[RESULT] alpha0.1_plain_smoothgrad_ime: 0.6917\n"}
+,{"stream_name":"stdout","time":15187.282520328,"data":"[RESULT] alpha0.1_plain_smoothgrad_sec_per_sample: 0.0525\n"}
+,{"stream_name":"stdout","time":15187.282562738,"data":"[RESULT] alpha0.1_saliency_emd: 0.1114\n"}
+,{"stream_name":"stdout","time":15187.282566778,"data":"[RESULT] alpha0.1_saliency_ime: 0.6923\n"}
+,{"stream_name":"stdout","time":15187.282568718,"data":"[RESULT] alpha0.1_saliency_sec_per_sample: 0.0030\n"}
+,{"stream_name":"stdout","time":15187.282570578,"data":"[RESULT] alpha0.1_deeplift_emd: 0.1348\n"}
+,{"stream_name":"stdout","time":15187.282572458,"data":"[RESULT] alpha0.1_deeplift_ime: 0.7136\n"}
+,{"stream_name":"stdout","time":15187.282574278,"data":"[RESULT] alpha0.1_deeplift_sec_per_sample: 0.0021\n"}
+,{"stream_name":"stdout","time":15187.282576208,"data":"[RESULT] alpha0.1_gradient_shap_emd: 0.1386\n"}
+,{"stream_name":"stdout","time":15187.282578038,"data":"[RESULT] alpha0.1_gradient_shap_ime: 0.7268\n"}
+,{"stream_name":"stdout","time":15187.282579938,"data":"[RESULT] alpha0.1_gradient_shap_sec_per_sample: 0.0470\n"}
+,{"stream_name":"stdout","time":15187.282581798,"data":"[RESULT] alpha0.1_guided_backprop_emd: 0.1124\n"}
+,{"stream_name":"stdout","time":15187.282583648,"data":"[RESULT] alpha0.1_guided_backprop_ime: 0.6973\n"}
+,{"stream_name":"stdout","time":15187.282585478,"data":"[RESULT] alpha0.1_guided_backprop_sec_per_sample: 0.0015\n"}
+,{"stream_name":"stdout","time":15187.282587338,"data":"[RESULT] alpha0.1_sobel_emd: 0.1364\n"}
+,{"stream_name":"stdout","time":15187.282589168,"data":"[RESULT] alpha0.1_sobel_ime: 0.7427\n"}
+,{"stream_name":"stdout","time":15187.282591128,"data":"[RESULT] alpha0.1_sobel_sec_per_sample: 0.0002\n"}
+,{"stream_name":"stdout","time":15187.282593028,"data":"[RESULT] alpha0.1_laplace_emd: 0.1025\n"}
+,{"stream_name":"stdout","time":15187.282594868,"data":"[RESULT] alpha0.1_laplace_ime: 0.5969\n"}
+,{"stream_name":"stdout","time":15187.282596688,"data":"[RESULT] alpha0.1_laplace_sec_per_sample: 0.0001\n"}
+,{"stream_name":"stdout","time":15187.325661023,"data":"Results saved to /kaggle/working/sweep_part1_results.json\n"}
+,{"stream_name":"stdout","time":15187.326622573,"data":"\n"}
+,{"stream_name":"stdout","time":15187.326637463,"data":"Total sweep time: 15164.1s\n"}
+,{"stream_name":"stdout","time":15187.326641703,"data":"Sweep part 1 complete.\n"}
+,{"stream_name":"stderr","time":15191.348342407,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":15191.348386587,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":15191.633655819,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":15191.633690039,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":15192.470212347,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":15192.94471783,"data":"[NbConvertApp] Writing 287158 bytes to __results__.html\n"}
+]

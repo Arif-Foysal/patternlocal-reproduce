@@ -228,9 +228,9 @@ residual deltas come from mask thresholds and eval details rather than data.
 
 | status | sweeps |
 |---|---|
-| analyzed (41) | XOR CORR 0.1–0.9; LIN CORR 0.1–0.9; LIN WHITE 0.1–0.9; XOR WHITE 0.1–0.7; RIGID CORR 0.2–0.8 |
-| running (5) | XOR WHITE 0.8, 0.9; RIGID CORR 0.9; RIGID WHITE 0.7, 0.8 |
-| not yet pushed (1) | RIGID WHITE 0.9 |
+| analyzed (44) | XOR CORR 0.1–0.9; LIN CORR 0.1–0.9; LIN WHITE 0.1–0.9; XOR WHITE 0.1–0.9; RIGID CORR 0.2–0.9; RIGID WHITE 0.7–0.9 |
+| running (0) | — |
+| pushed / complete (3) | RIGID WHITE 0.9 fetched; XOR WHITE 0.8/0.9 fetched |
 
 Gated (not run): RIGID CORR 0.1 (acc 0.504); RIGID WHITE 0.1–0.6 (acc below 0.90;
 0.6 = 0.8465).

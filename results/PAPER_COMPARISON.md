@@ -120,30 +120,35 @@ Reading:
   LIN WHITE TABLE COMPLETE.
 
 ---------------------------------------------------------------
-## XOR WHITE (white background) — a=0.1–0.4 (a=0.1/0.2 re-running after launch errors)
+## XOR WHITE (white background) — a=0.3–0.7 (a=0.1, 0.2 re-running after launch errors)
 
-| method | a=0.1 | a=0.2 | a=0.3 | a=0.4 |
-|---|---|---|---|---|
-| patternlocal | — | — | **0.0374** | **0.0328** |
-| analytical_grad | — | — | 0.0527 | 0.0483 |
-| analytical_ig | — | — | 0.0541 | 0.0512 |
-| gradient_shap | — | — | 0.1106 | 0.1006 |
-| lime | — | — | — | — |
-| laplace | — | — | 0.1671 | — |
+| method | a=0.2 | a=0.3 | a=0.4 | a=0.5 | a=0.6 | a=0.7 |
+|---|---|---|---|---|---|---|
+| patternlocal | **0.0566** | **0.0374** | **0.0328** | **0.0300** | **0.0448** | **0.0400** |
+| analytical_grad | 0.0705 | 0.0527 | 0.0483 | 0.0461 | 0.0477 | 0.0485 |
+| analytical_ig | 0.0858 | 0.0541 | 0.0512 | 0.0534 | 0.0675 | 0.0663 |
+| gradient_shap | — | 0.1106 | 0.1006 | — | — | — |
+| lime | 0.1335 | — | — | — | — | — |
+| laplace | 0.1375 | 0.1671 | 0.1374 | 0.1374 | 0.1373 | 0.1372 |
+| sobel | — | — | — | — | — | — |
 
-Reading (a=0.3, 0.4):
-* **PatternLocal is the outright winner on EMD here** (rank 1/13 at both:
-  0.0374, 0.0328) — the only scenario so far where PL takes EMD #1. Sobel/Laplace
-  are last (Laplace 13/13).
-* **AIG holds IME rank 1/13 at both points** (0.0404, 0.0307) while its EMD is
-  rank 3 — the EMD-vs-IME split again: PL best support recovery, AIG best
-  false-positive suppression. AG ranks 2 on both.
-* XOR WHITE separates what XOR CORR did not: on correlated background PL/AIG/
-  AG are nearly tied (analytic family converges); on white background PL pulls
-  ahead on EMD while AIG keeps the IME crown.
+IME: AIG 0.1178(r2), 0.0404(r1), 0.0307(r1), 0.0254(r1), 0.0221(r2), 0.0195(r2) — AIG holds
+false-positive crown on white background; PL IME 0.1647(r3), 0.0431, 0.0311, —, —, —.
+
+Reading:
+* **PatternLocal is the outright EMD winner** at every completed point (rank
+  1/13: 0.0374, 0.0328, 0.0300, 0.0448, 0.0400) — the only scenario so far
+  where PL takes EMD #1. Note the a=0.6 uptick (0.0300 -> 0.0448) mirrors the
+  XOR CORR high-alpha floor softening.
+* **AIG holds IME rank 1-2 everywhere** — on white background AIG keeps the
+  false-positive crown even though its EMD drops to rank 3-6 at high alpha:
+  the EMD-vs-IME split again (PL best support recovery, AIG best
+  false-positive suppression). AG ranks 2 on both metrics at a=0.3/0.4.
+* Laplace/Sobel dead last at every point (Laplace 13/13) — filters do not
+  recover on white XOR either.
 
 ---------------------------------------------------------------
-## Analytical-IG vs the field — rank summary (28 completed points)
+## Analytical-IG vs the field — rank summary (35 completed points)
 
 Ranks among all 13 methods (EMD rank / IME rank):
 
@@ -176,8 +181,13 @@ Ranks among all 13 methods (EMD rank / IME rank):
 | WLIN 0.7 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
 | WLIN 0.8 | **1/13**, **1/13** | 2/13 | 3/13 | AIG / AIG |
 | WLIN 0.9 | **1/13**, **1/13** | 3/13 | 2/13 | AIG / AIG |
+| WXOR 0.2 | 3/13, r2 | **1/13** | 2/13 | PL / AIG |
+| WXOR 0.2 | 3/13, r2 | **1/13** | 2/13 | PL / AIG |
 | WXOR 0.3 | 3/13, **1/13** | **1/13** | 2/13 | PL / AIG |
 | WXOR 0.4 | 3/13, **1/13** | **1/13** | 2/13 | PL / AIG |
+| WXOR 0.5 | 3/13, **1/13** | **1/13** | 2/13 | PL / AIG |
+| WXOR 0.6 | 3/13, r2 | **1/13** | 2/13 | PL / AIG |
+| WXOR 0.7 | r6, r2 | **1/13** | 2/13 | PL / AIG |
 | RIGID 0.2 | **2/13**, 3/13 | 11/13 | **13/13** | Laplace |
 | RIGID 0.3 | **2/13**, 3/13 | 4/13 | **12/13** | Laplace |
 
@@ -191,10 +201,10 @@ Findings:
    integration is what keeps the covariance kernel informative under
    translation/rotation. PL is also weak in RIGID (11th at a=0.2).
 3. **AIG wins outright in LIN at high alpha:** rank 1/13 on both metrics at
-   LIN CORR a=0.9 and LIN WHITE a=0.4, a=0.5, a=0.6 — three outright wins
-   on white background alone (0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214).
-   Path-integration denoises past the plain gradient exactly where the
-   family converges at high noise.
+   LIN CORR a=0.9 and LIN WHITE a=0.4–0.9 — six outright wins on white
+   background alone (0.0154/0.0298, 0.0151/0.0247, 0.0149/0.0214,
+   0.0148/0.0191, 0.0147/0.0174, 0.0147/0.0161). Path-integration denoises
+   past the plain gradient exactly where the family converges at high noise.
 4. **AIG's weak spot is XOR high-alpha EMD** (rank 8 at a=0.7–0.9) while it
    holds IME rank 2 — an EMD-vs-IME trade-off to report in the thesis.
 5. AG dominates EMD+IME in LIN and low-alpha XOR (rank 1–2); the analytical
@@ -212,11 +222,17 @@ data semantics. No low-alpha gradient-family collapse.
 ---------------------------------------------------------------
 ## Grid state
 
-Done (30): XOR corr complete; LIN corr complete; LIN white complete;
-XOR white 0.3–0.4; RIGID corr 0.2–0.3.
-Running: xor-white 1, 2 (re-run after launch error); xor-white 5.
-Remaining: xor-white 0.1, 0.2, 0.5–0.9; rigid-corr 0.4–0.9;
-rigid-white 0.7–0.9.
+Done (35 fetched & analyzed): XOR corr complete (0.1–0.9); LIN corr
+complete (0.1–0.9); LIN white complete (0.1–0.9); XOR white 0.2–0.7;
+RIGID corr 0.2–0.3.
+Running (5): xor-white 1 (re-run, still going), xor-white 8, xor-white 9,
+rigid-corr 4, rigid-corr 5.
+Remaining to push (7): rigid-corr 6–9, rigid-white 7–9.
+Still-to-fetch when complete: xor-white 1, 8, 9; rigid-corr 4, 5.
+
+Total planned: 47 (XOR corr 9, LIN corr 9, LIN white 9, XOR white 9,
+RIGID corr 8 valid α=0.2–0.9, RIGID white 3 valid α=0.7–0.9).
+Progress: 35 fetched + 5 running = 40; 7 remaining.
 
 ---------------------------------------------------------------
 ## SLOT NOTES (working log — not results)

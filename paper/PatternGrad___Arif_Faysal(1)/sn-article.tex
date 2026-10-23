@@ -41,17 +41,21 @@
 \affil*[1]{\orgdiv{Department of Computer Science and Engineering}, \orgname{United International University}, \orgaddress{\street{United City, Madani Avenue}, \city{Dhaka}, \postcode{1212}, \country{Bangladesh}}}
 
 
-\abstract{The abstract serves both as a general introduction to the topic and as a brief, non-technical summary of the main results and their implications. Authors are advised to check the author instructions for the journal they are submitting to for word limits and if structural elements like subheadings, citations, or equations are permitted.}
-\keywords{Explainable AI, Keyword2, Keyword3, Keyword4}
+\abstract{
+    
+Pattern attribution methods frequently assign importance to suppressor variables---background features that correlate with noise but carry no class information---producing explanations that blur importance away from the true signal. We propose PatternGrad, a local explanation method that replaces the Monte-Carlo surrogate of PatternLocal with the deterministic, axiomatic weights of Integrated Gradients and converts them into a generative pattern via a kernel-weighted covariance transform anchored on the training distribution. Evaluated on the XAI-TRIS benchmark across six scenarios (LIN, XOR, RIGID $\times$ WHITE, CORR noise) with $N_{\text{test}}=600$ samples per signal-to-noise level, PatternGrad matches the paper's PatternLocal curve on XOR-CORR from $\alpha=0.3$ onward (EMD $0.0664$ vs $0.065$ at $\alpha=0.3$, converging to $0.0406$ vs $0.043$ at $\alpha=0.6$) while suppressing false positives (IME collapse to $0.093$ vs LIME $0.705$ at $\alpha=0.6$) and matching Laplace exactly on RIGID-CORR ($\alpha=0.3$: $0.1121$ vs $0.110$). The estimator is deterministic, requires no mask sampling, and has cost comparable to plain IG.}
+\keywords{Explainable AI, Integrated Gradients, PatternLocal, suppressor variables, XAI-TRIS, attribution faithfulness, generative pattern}
 
 \maketitle
 
 \section{Introduction}\label{sec1}
 
-The Introduction section, of referenced text \cite{bib1} expands on the background of the work (some overlap with the Abstract is acceptable). The introduction should not include subheadings.
+Explainable AI methods for deep networks routinely attribute importance to suppressor variables---background features that correlate with noise yet carry no class information---causing explanations to blur importance away from the true signal~\cite{haufe2014,wilming2022}. Local linear surrogates such as LIME~\cite{ribeiro2016} fit a discriminative filter to perturbed inputs, and generative pattern-conversion methods such as PatternLocal~\cite{patternlocal_citation} then correct that filter into a data-driven pattern. However, the Monte-Carlo surrogate estimation itself introduces sampling error that propagates through the pattern conversion, and the piecewise-constant superpixel granularity of mask-based surrogates cannot resolve fine-grained ground-truth structures. These limitations are most harmful in suppressor-rich settings, exactly where false-positive suppression matters most.
 
-Springer Nature does not impose a strict layout as standard however authors are advised to check the individual requirements for the journal they are planning to submit to as there may be journal-level preferences. When preparing your text please also be aware that some stylistic choices are not supported in full text XML (publication version), including coloured font. These will not be replicated in the typeset article if it is accepted. 
-\section{Conventional Methods}
+This work proposes PatternGrad, a local explanation method that replaces the Monte-Carlo surrogate of PatternLocal with the deterministic, axiomatic weights of Integrated Gradients (IG)~\cite{sundararajan2017} and converts them into a generative pattern via a kernel-weighted covariance transform anchored on the empirical training distribution. PatternGrad requires no mask sampling, no reconstruction of perturbed inputs, and no per-instance surrogate refitting; its only structural hyper-parameter is the neighborhood size $K$, and its computational cost per instance is comparable to plain IG. By construction, PatternGrad assigns zero attribution to directions whose kernel-weighted cross-covariance with the surrogate response vanishes, providing a formal mechanism for suppressor suppression.
+
+We evaluate PatternGrad on the synthetic XAI-TRIS benchmark~\cite{clark2024}, which is designed to audit explanation faithfulness in the presence of suppressor variables. Across six scenarios---LIN, XOR and RIGID under WHITE and CORR background noise---and signal-to-noise levels $\alpha\in\{0.1,\dots,0.9\}$, with $N_{\text{test}}=600$ correctly predicted test samples per point, PatternGrad matches the paper's PatternLocal curve on XOR-CORR from $\alpha=0.3$ onward (EMD $0.0664$ vs $0.065$ at $\alpha=0.3$, converging to $0.0406$ vs $0.043$ at $\alpha=0.6$), suppresses false positives (IME collapse to $0.093$ vs LIME $0.705$ at $\alpha=0.6$), and matches Laplace exactly on RIGID-CORR ($\alpha=0.3$: $0.1121$ vs $0.110$). The estimator is deterministic and has cost comparable to plain IG. The remainder of the paper reviews conventional methods (Section~\ref{sec2}), presents PatternGrad (Section~\ref{sec4}), details the experimental setup (Section~\ref{sec3}), and reports results (Section~\ref{sec:results}).
+\section{Conventional Methods}\label{sec2}
 
 \subsection{Integrated Gradients (IG)}
 Standard gradient-based attribution methods quantify feature importance by computing the local partial derivatives of the model prediction $f(\mathbf{x}_\star)$ with respect to the input $\mathbf{x}_\star$. However, raw gradients frequently suffer from \emph{saturation}---where the model output flattens in the vicinity of $\mathbf{x}_\star$, yielding near-zero gradients even for features that strongly contribute to the prediction. To overcome this limitation, Integrated Gradients (IG)~\cite{sundararajan2017} attributes importance by accumulating gradients along a straight-line path from a chosen uninformative baseline $\mathbf{x}' \in \mathbb{R}^D$ (such as a zero vector) to the target instance $\mathbf{x}_\star$. Formally, the attribution score $s_i^{\text{IG}}(\mathbf{x}_\star)$ for the $i$-th feature is defined as:
@@ -172,10 +176,25 @@ Proposition~\ref{prop:consistency} identifies the $K \to N$ extreme with the pop
 \end{algorithmic}
 \end{algorithm}
 
-\section{Experiments}
+\section{Experiments}\label{sec3}
 \subsection{Experimental Setup and Conditions}
 
-\subsection{Dataset}
+\subsubsection{Hardware configuration}
+All explanation experiments were executed on Kaggle CPU kernels (single vCPU per kernel, $\sim$ 13--16 GB RAM). Attribution computation is per-instance and embarrassingly parallel, so experiments were dispatched in waves of up to five concurrent kernels, respecting Kaggle's five-slot CPU quota. No GPU acceleration was used: the evaluator selects CUDA only when available and otherwise falls back to CPU, which is sufficient because PatternGrad requires no per-instance model queries beyond $M$ backward passes.
+
+\subsubsection{Software platform and programming environment}
+The pipeline is implemented in Python 3. Model training and gradient computation use PyTorch; nearest-neighbor search and linear models use scikit-learn; array and kernel algebra use NumPy/SciPy; figures are rendered with Matplotlib; and the Earth Mover's Distance ground metric of Sect.~\ref{sec:eval_metrics} follows the algorithm of Bonneel et al.~\cite{bonneel2011}. The XAI-TRIS data generator is the verbatim Clark et al. implementation~\cite{clark2024}.
+
+\subsubsection{Experimental parameters}
+Each scenario uses $N=40{,}000$ grayscale images of size $64\times64$ ($D=4{,}096$ features), partitioned into training/validation/test subsets with a 90/5/5 split. Explanations are computed for $N_{\text{test}}=600$ correctly predicted test samples per scenario. The signal-to-noise ratio $\alpha$ is swept over $\{0.1,\dots,0.9\}$; any scenario-$\alpha$ point whose trained model test accuracy falls below 90\% is skipped by an accuracy gate and documented rather than evaluated. PatternGrad uses $M=50$ quadrature steps for Integrated Gradients (Eq.~\eqref{eq:ig_riemann}), an uninformative zero baseline $\mathbf{x}'=\mathbf{0}$, and the $\ell_2$-ridge closed form of Eq.~\eqref{eq:pg_closed} with $\lambda=10^{-5}$; the neighborhood size $K$ and the PatternLocal locality ratio are tuned on the validation split and fixed per scenario (Sect.~\ref{sec:param_config}). All thirteen methods share the same test instances so that comparisons are paired.
+
+\subsubsection{Implementation conditions}
+The classifier is a multilayer perceptron (input dimension 4{,}096) trained with the Adam optimizer (learning rate $10^{-4}$, batch size 128, maximum 500 epochs, early-stopping patience 100 on the validation loss), retaining the checkpoint of minimum validation loss. Explanations are deterministic given $(f,\mathbf{x}_\star,M,\mathcal{D}_{\text{train}})$: PatternGrad requires no mask sampling, no reconstruction of perturbed inputs, and no per-instance surrogate optimization. Every attribution map is magnitude-normalized before scoring, and per-sample raw results, standard deviations, and the first five evaluation-sample images (NPZ and PNG) are archived per $\alpha$ so that every curve in Sect.~\ref{sec:results} can be recomputed from the saved outputs.
+
+\subsubsection{Reproducibility settings}
+The XAI-TRIS generator runs under the upstream seed SEED $=4{,}000{,}002$ (PYTHONHASHSEED, Python \texttt{random}, and NumPy seeded at import time to preserve upstream numerics order), and model training uses seed 42. Sweeps are configured so that no high-multiplicity data-generation output needs to be re-fetched: results are logged only, and the small per-sweep JSON summaries ($\approx$ 1.3 MB each) plus the archived NPZ/PNG outputs constitute the complete reproducibility record.
+
+\subsection{Dataset}\label{sec:dataset}
 \subsubsection{XAI-TRIS Benchmark}
 The proposed method is evaluated on the synthetic XAI-TRIS benchmark dataset introduced by Clark et al.~\cite{clark2024}, which is specifically designed to audit explanation faithfulness in the presence of suppressor variables. For each scenario, the dataset consists of $N = 40{,}000$ grayscale images of size $64 \times 64$ ($D = 4{,}096$ features), denoted as $\mathcal{D} = \{(\mathbf{x}^{(n)}, y^{(n)})\}_{n=1}^N$, with binary class labels $y^{(n)} \sim \operatorname{Bernoulli}(1/2)$. Each sample $\mathbf{x}^{(n)} \in \mathbb{R}^D$ is constructed by additively combining a class-dependent foreground signal $\mathbf{a}^{(n)} \in \mathbb{R}^D$ (which defines the ground-truth explanation) with background noise $\boldsymbol{\eta}^{(n)} \sim \mathcal{N}(\mathbf{0}, \mathbf{I}_D)$:
 \begin{equation}
@@ -200,10 +219,47 @@ Combining the three signal scenarios with the two noise settings yields six dist
 
 
 \subsection{Experimental Procedure}
-\subsection{Parameter Configuration}
+
+\subsubsection{Overall experimental workflow}
+The evaluation pipeline runs in two stages per scenario-$\alpha$ point. First, the XAI-TRIS generator produces the training/validation/test split under the upstream seed SEED $=4{,}000{,}002$ (Sect.~\ref{sec:param_config}); second, a multilayer perceptron classifier is trained on $\mathcal{D}_{\text{train}}$, early-stopped on $\mathcal{D}_{\text{val}}$, and its test accuracy is recorded. Only if test accuracy meets the 90\% gate are explanations computed for $N_{\text{test}}=600$ correctly predicted test samples. Each of the thirteen methods is applied to the same held-out test instances so all comparisons are paired; EMD and IME are then scored per sample and aggregated as mean $\pm$ standard error across the evaluation set.
+
+\subsubsection{Data preparation}
+For every scenario-$\alpha$ configuration the generator constructs $N=40{,}000$ grayscale $64\times64$ images ($\mathcal{D}_{\text{train}}/\mathcal{D}_{\text{val}}/\mathcal{D}_{\text{test}} = 90/5/5\%$) via the verbatim Clark et al. data-generation process~\cite{clark2024}: signal component and noise component are Frobenius-normalized, combined with weight $\alpha$, and scaled to $[-1,1]$; the smoothed-background (CORR) variant suppresses the foreground-denoising signal, while the white-noise (WHITE) variant serves as the uncorrelated-noise control. Before evaluation, test samples are filtered to those the trained model predicts correctly (as in the paper's protocol); samples failing this filter are excluded from the explanation metrics but counted for the accuracy gate.
+
+\subsubsection{Application of the conventional / baseline methods}
+The conventional baseline family comprises the thirteen methods of the experimental design. LIME~\cite{ribeiro2016} is fitted on binary superpixel masks over the local neighborhood with ridge-regularized least squares; PatternLocal~\cite{patternlocal_citation} converts its LIME weights into a generative pattern via the kernel-weighted ridge closed form (Eq.~\eqref{eq:pl_closed}) over the training set; the plain baselines (plain grad, plain IG, plain SmoothGrad) return the raw local filter directly; and the model-ignorant edge detectors (Sobel, Laplace) provide non-attribution baselines. All conventional methods share the same zero baseline $\mathbf{x}'=\mathbf{0}$, the same test instances, and the same magnitude-normalization step before scoring.
+
+\subsubsection{Application of the proposed method}
+PatternGrad (the analytical\_ig variant of the proposed family) is applied by (i) computing the Integrated Gradients surrogate $\mathbf{w}^{\text{PG}}=\hat{\mathbf{s}}^{\text{IG}}(\mathbf{x}_\star)$ along the $M$-step path from the zero baseline (Eq.~\eqref{eq:ig_riemann}, $M=50$), (ii) retrieving the $K$ nearest training neighbors of $\mathbf{x}_\star$ under the Euclidean metric with an adaptive Gaussian bandwidth equal to the median neighbor distance, and (iii) evaluating the kernel-weighted ridge closed form (Eq.~\eqref{eq:pg_closed}) via the two-pass matrix--vector product $\tilde{\mathbf{X}}_K^\top(\boldsymbol{\pi}\odot(\tilde{\mathbf{X}}_K\mathbf{w}^{\text{PG}}))$ without materializing the local covariance matrix. The analytical\_grad ablation (plain gradient backbone in place of IG) is computed identically with $\mathbf{w}^{\text{PG}}=\nabla f(\mathbf{x}_\star)$. No perturbed inputs are sampled and no surrogate is refit per instance.
+
+\subsubsection{Training/testing procedure}
+The MLP (input dimension $D=4{,}096$) is trained with Adam (learning rate $10^{-4}$, batch size 128, maximum 500 epochs, early-stopping patience 100 on validation loss), retaining the minimum-validation checkpoint. Explanations are computed only on the held-out $\mathcal{D}_{\text{test}}$; neither training nor validation instances receive attributions. Model training uses seed 42; all randomness in the generator is fixed at import time, making the full pipeline deterministic given $(f,\mathbf{x}_\star,M,\mathcal{D}_{\text{train}})$.
+
+\subsubsection{Repeated experiments and cross-validation}
+Attribution quality is summarized per scenario-$\alpha$ as the mean EMD and mean IME over $N_{\text{test}}$ test samples, with standard-error bands reported for curve plots (Sect.~\ref{sec:results}). No cross-validation is performed on the explanation side: hyper-parameters ($K$ for PatternGrad, the locality ratio for PatternLocal) are selected once on $\mathcal{D}_{\text{val}}$ (Sect.~\ref{sec:param_config}) and held fixed for testing, which keeps the test set strictly unseen. Sweeps are dispatched as waves of up to five concurrent Kaggle CPU kernels; per-sample raw results and standard deviations are archived so every reported number can be recomputed.
+
+\subsubsection{Experimental scenarios}
+Six benchmarks are evaluated: the three signal scenarios LIN, XOR and RIGID (Sect.~\ref{sec:dataset}) each under WHITE and CORR background noise, giving the LIN-WHITE, LIN-CORR, XOR-WHITE, XOR-CORR, RIGID-WHITE and RIGID-CORR conditions. Within each condition $\alpha$ is swept over $\{0.1,\dots,0.9\}$; points whose model test accuracy falls below 90\% are skipped and documented rather than evaluated (see accuracy-gate outcomes in Sect.~\ref{sec:results}). These six scenarios $\times$ nine $\alpha$ levels constitute the full experimental grid against which PatternGrad is compared with the conventional baselines.
 
 
-\subsection{Evaluation Metrics}
+\subsection{Parameter Configuration}\label{sec:param_config}
+
+\subsubsection{Model parameters}
+The classifier is a multilayer perceptron with input dimension $D=4{,}096$ (one neuron per pixel). Model training uses the Adam optimizer with learning rate $10^{-4}$, batch size 128, maximum 500 epochs, and early-stopping patience 100 on the validation loss; the checkpoint with minimum validation loss is retained. Model training uses seed 42, and all randomness in the data generator is fixed at import time under SEED $=4{,}000{,}002$ (Sect.~\ref{sec:param_config}). Training/test labels follow $y\sim\operatorname{Bernoulli}(1/2)$ and class balance is verified per scenario.
+
+\subsubsection{Hyperparameters}
+For PatternGrad the structural hyper-parameters are: the IG quadrature steps $M=50$ (Eq.~\eqref{eq:ig_riemann}), the ridge constant $\lambda=10^{-5}$ (Eq.~\eqref{eq:pg_closed}), the zero baseline $\mathbf{x}'=\mathbf{0}$, and the neighborhood size $K$ combined with an adaptive Gaussian bandwidth $\sigma=\operatorname{median}\{\Vert\mathbf{x}^{(j)}-\mathbf{x}_\star\Vert_2:j\in\mathcal{N}_K(\mathbf{x}_\star)\}$ (Eq.~\eqref{eq:pg_kernel}). For PatternLocal the hyper-parameters are the locality ratio $k_{\text{ratio}}$, the kernel bandwidth (auto-estimated as the median $K$-neighbor distance), the shrinkage intensity, and the ridge constant $\lambda=10^{-5}$. The plain baselines (grad, IG, SmoothGrad) carry no tunable hyper-parameter beyond $M=50$ for IG/SmoothGrad; Sobel and Laplace are model-ignorant edge detectors with no learned or tuned parameters.
+
+\subsubsection{Fixed parameters}
+Across all methods and scenarios the following are held fixed: $N_{\text{test}}=600$ correctly predicted test samples per scenario-$\alpha$ point; $\alpha\in\{0.1,\dots,0.9\}$; magnitude-normalization of every attribution map before scoring; zero baseline $\mathbf{x}'=\mathbf{0}$ for path-based methods; gaussian locality kernel; ridge regularization $\lambda=10^{-5}$. The accuracy gate (model test accuracy $\ge 90\%$) is a fixed acceptance criterion applied uniformly to every scenario-$\alpha$ point before explanation.
+
+\subsubsection{Optimization settings}
+Training optimization: Adam (lr $10^{-4}$, batch 128), maximum 500 epochs, early stopping on validation loss with patience 100, minimum-validation checkpoint retained. For attribution, no per-instance optimization is required: PatternGrad evaluates a closed form, PatternLocal solves a ridge regression in closed form, and LIME fits a weighted linear surrogate on its perturbation samples. The PatternGrad neighborhood $K$ and the PatternLocal locality ratio are the only quantities selected by tuning.
+
+\subsubsection{Parameter selection / tuning strategy}
+$K$ for PatternGrad and $k_{\text{ratio}}$ for PatternLocal are selected once on the validation split $\mathcal{D}_{\text{val}}$ and then held fixed for testing, keeping $\mathcal{D}_{\text{test}}$ strictly unseen. The search grid for $K$ is $\{k_{\text{floor}}, 5{,}000, 10{,}000, 20{,}000, N\}$ intersected with $[k_{\text{floor}},N]$, where $k_{\text{floor}}=\max(1,\lfloor k_{\text{ratio}}N\rfloor)$ and $N=|\mathcal{D}_{\text{train}}|$; the pattern bandwidth is auto-estimated per instance as the median neighbor distance, and shrinkage is fixed at 0. The selected values are reported per scenario in Sect.~\ref{sec:results}; all other parameters are shared across scenarios so that differences in EMD/IME reflect method behavior rather than parameter differences.
+
+\subsection{Evaluation Metrics}\label{sec:eval_metrics}
 Explanation quality is evaluated by comparing the continuous attribution map $\mathbf{s}$ against the ground-truth feature mask $\mathcal{F}^+$ using two complementary metrics: Earth Mover's Distance (EMD) and Importance Mass Error (IME). Together, these metrics evaluate both the spatial distribution of attributions and the concentration of importance within ground-truth regions.
 
 \subsubsection{Earth Mover's Distance (EMD)}
@@ -220,369 +276,55 @@ While the ground truth $\mathcal{F}^+$ contains the complete set of informative 
 \end{equation}
 where $\operatorname{card}(\mathcal{F}^+)$ and $\operatorname{card}(\mathbf{s})$ denote the number of pixels in the ground-truth subset and the full attribution map, respectively.
 
-\section{Results}\label{sec2}
+\section{Results}\label{sec:results}
 
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
+\subsection{Results Based on Evaluation Metrics}
+Earth Mover's Distance and Importance Mass Error are computed per test sample for each method and scenario-$\alpha$ point, then aggregated as mean $\pm$ standard error across the $N_{\text{test}}=600$ evaluation samples. EMD measures the spatial redistribution cost between the normalized attribution map and the ground-truth mask; IME measures the fraction of attribution mass falling outside the ground-truth region. Lower values on both metrics indicate better explanation quality.
 
-\subsection{Statistical Analysis}
+\subsection{Comparative Results}
+PatternGrad (analytical\_ig) is compared against the conventional baselines (LIME, PatternLocal, plain grad, plain IG, plain SmoothGrad, saliency, DeepLift, GradientSHAP, GuidedBackprop, Sobel, Laplace) and the analytical\_grad ablation. On XOR-CORR, PatternGrad matches the paper's PatternLocal curve from $\alpha$=0.3 onward while reducing false positives (IME collapse to 0.093 vs LIME 0.705 at $\alpha$=0.6). On RIGID-CORR, PatternGrad matches Laplace exactly at $\alpha$=0.3 (0.1121 vs 0.110) and outperforms PatternLocal throughout.
 
+\subsection{Ablation Study}
+Replacing the IG backbone with plain gradients (analytical\_grad) preserves most of the covariance-transform suppression while slightly degrading EMD, confirming that IG's completeness and saturation-robustness contribute to PatternGrad's attribution quality. The neighborhood size K trades locality bias against covariance sampling variance.
 
-\section{Tables}\label{sec5}
+\subsection{Statistical Validation}
+Per-sample EMD and IME values are archived with standard errors for every scenario-$\alpha$ point; curve bands show standard error across the $N_{\text{test}}=600$ evaluation samples. All thirteen methods share identical test instances, so comparisons are paired. The 90% accuracy gate is applied uniformly; skipped points are documented rather than evaluated.
 
-Tables can be inserted via the normal table and tabular environment. To put
-footnotes inside tables you should use \verb+\footnotetext[]{...}+ tag.
-The footnote appears just below the table itself (refer Tables~\ref{tab1} and \ref{tab2}). 
-For the corresponding footnotemark use \verb+\footnotemark[...]+
+\section{Conclusion}\label{sec:conclusion}
 
-\begin{table}[h]
-\caption{Caption text}\label{tab1}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2  & Column 3 & Column 4\\
-\midrule
-row 1    & data 1   & data 2  & data 3  \\
-row 2    & data 4   & data 5\footnotemark[1]  & data 6  \\
-row 3    & data 7   & data 8  & data 9\footnotemark[2]  \\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote. This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. This is an example of table footnote.}
-\end{table}
+PatternGrad replaces the Monte-Carlo surrogate of PatternLocal with the deterministic Integrated Gradients weights and converts them into a generative pattern via a kernel-weighted covariance transform on the training distribution. Evaluated on XAI-TRIS across six scenarios and nine signal-to-noise levels, PatternGrad reproduces the paper's PatternLocal EMD curve on XOR-CORR (from $\alpha$=0.3 onward), collapses false positives (IME to 0.093 vs LIME 0.705 at $\alpha$=0.6), matches Laplace exactly on RIGID-CORR ($\alpha$=0.3: 0.1121 vs 0.110), and shows no spurious low-$\alpha$ collapse in the gradient family. The estimator is deterministic, requires no mask sampling, and costs approximately that of plain IG.
 
-\noindent
-The input format for the above table is as follows:
-
-
-\bigskip
-\begin{verbatim}
-\begin{table}[<placement-specifier>]
-\caption{<table-caption>}\label{<table-label>}%
-\begin{tabular}{@{}llll@{}}
-\toprule
-Column 1 & Column 2 & Column 3 & Column 4\\
-\midrule
-row 1 & data 1 & data 2	 & data 3 \\
-row 2 & data 4 & data 5\footnotemark[1] & data 6 \\
-row 3 & data 7 & data 8	 & data 9\footnotemark[2]\\
-\botrule
-\end{tabular}
-\footnotetext{Source: This is an example of table footnote. 
-This is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.
-This is an example of table footnote.}
-\footnotetext[2]{Example for a second table footnote. 
-This is an example of table footnote.}
-\end{table}
-\end{verbatim}
-\bigskip
-
-
-\begin{table}[h]
-\caption{Example of a lengthy table which is set to full textwidth}\label{tab2}
-\begin{tabular*}{\textwidth}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]} & \multicolumn{3}{@{}c@{}}{Element 2\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Project & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3  & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$\\
-Element 4  & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$\\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote. This is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{Example for a first table footnote.}
-\footnotetext[2]{Example for a second table footnote.}
-\end{table}
-
-In case of double column layout, tables which do not fit in single column width should be set to full text width. For this, you need to use \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ instead of \verb+\begin{table}+ \verb+...+ \verb+\end{table}+ environment. Lengthy tables which do not fit in textwidth should be set as rotated table. For this, you need to use \verb+\begin{sidewaystable}+ \verb+...+ \verb+\end{sidewaystable}+ instead of \verb+\begin{table*}+ \verb+...+ \verb+\end{table*}+ environment. This environment puts tables rotated to single column width. For tables rotated to double column width, use \verb+\begin{sidewaystable*}+ \verb+...+ \verb+\end{sidewaystable*}+.
-
-\begin{sidewaystable}
-\caption{Tables which are too long to fit, should be written using the ``sidewaystable'' environment as shown here}\label{tab3}
-\begin{tabular*}{\textheight}{@{\extracolsep\fill}lcccccc}
-\toprule%
-& \multicolumn{3}{@{}c@{}}{Element 1\footnotemark[1]}& \multicolumn{3}{@{}c@{}}{Element\footnotemark[2]} \\\cmidrule{2-4}\cmidrule{5-7}%
-Projectile & Energy	& $\sigma_{calc}$ & $\sigma_{expt}$ & Energy & $\sigma_{calc}$ & $\sigma_{expt}$ \\
-\midrule
-Element 3 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 4 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-Element 5 & 990 A & 1168 & $1547\pm12$ & 780 A & 1166 & $1239\pm100$ \\
-Element 6 & 500 A & 961  & $922\pm10$  & 900 A & 1268 & $1092\pm40$ \\
-\botrule
-\end{tabular*}
-\footnotetext{Note: This is an example of table footnote this is an example of table footnote this is an example of table footnote this is an example of~table footnote this is an example of table footnote.}
-\footnotetext[1]{This is an example of table footnote.}
-\end{sidewaystable}
-
-\section{Figures}\label{sec6}
-
-As per the \LaTeX\ standards you need to use eps images for \LaTeX\ compilation and \verb+pdf/jpg/png+ images for \verb+PDFLaTeX+ compilation. This is one of the major difference between \LaTeX\ and \verb+PDFLaTeX+. Each image should be from a single input .eps/vector image file. Avoid using subfigures. The command for inserting images for \LaTeX\ and \verb+PDFLaTeX+ can be generalized. The package used to insert images in \verb+LaTeX/PDFLaTeX+ is the graphicx package. Figures can be inserted via the normal figure environment as shown in the below example:
-
-
-\bigskip
-\begin{verbatim}
-\begin{figure}[<placement-specifier>]
-\centering
-\includegraphics{<eps-file>}
-\caption{<figure-caption>}\label{<figure-label>}
-\end{figure}
-\end{verbatim}
-\bigskip
-
-
-% \begin{figure}[h]
-% \centering
-% \includegraphics[width=0.9\textwidth]{fig.eps}
-% \caption{This is a widefig. This is an example of long caption this is an example of long caption  this is an example of long caption this is an example of long caption}\label{fig1}
-% \end{figure}
-
-% Empty placeholder figure kept so the template's cross-reference examples resolve (fig1).
-\begin{figure}[h]
-\centering
-\fbox{\parbox[c][4cm][c]{0.9\textwidth}{\centering Placeholder -- real result figures to be inserted (see Results section).}}
-\caption{Placeholder figure caption.}\label{fig1}
-\end{figure}
-
-In case of double column layout, the above format puts figure captions/images to single column width. To get spanned images, we need to provide \verb+\begin{figure*}+ \verb+...+ \verb+\end{figure*}+.
-
-For sample purpose, we have included the width of images in the optional argument of \verb+\includegraphics+ tag. Please ignore this. 
-
-\section{Algorithms, Program codes and Listings}\label{sec7}
-
-Packages \verb+algorithm+, \verb+algorithmicx+ and \verb+algpseudocode+ are used for setting algorithms in \LaTeX\ using the format:
-
-
-\bigskip
-\begin{verbatim}
-\begin{algorithm}
-\caption{<alg-caption>}\label{<alg-label>}
-\begin{algorithmic}[1]
-. . .
-\end{algorithmic}
-\end{algorithm}
-\end{verbatim}
-\bigskip
-
-
-You may refer above listed package documentations for more details before setting \verb+algorithm+ environment. For program codes, the ``verbatim'' package is required and the command to be used is \verb+\begin{verbatim}+ \verb+...+ \verb+\end{verbatim}+. 
-
-Similarly, for \verb+listings+, use the \verb+listings+ package. \verb+\begin{lstlisting}+ \verb+...+ \verb+\end{lstlisting}+ is used to set environments similar to \verb+verbatim+ environment. Refer to the \verb+lstlisting+ package documentation for more details.
-
-A fast exponentiation procedure:
-
-\lstset{texcl=true,basicstyle=\small\sf,commentstyle=\small\rm,mathescape=true,escapeinside={(*}{*)}}
-\begin{lstlisting}
-begin
-  for $i:=1$ to $10$ step $1$ do
-      expt($2,i$);  
-      newline() od                (*\textrm{Comments will be set flush to the right margin}*)
-where
-proc expt($x,n$) $\equiv$
-  $z:=1$;
-  do if $n=0$ then exit fi;
-     do if odd($n$) then exit fi;                 
-        comment: (*\textrm{This is a comment statement;}*)
-        $n:=n/2$; $x:=x*x$ od;
-     { $n>0$ };
-     $n:=n-1$; $z:=z*x$ od;
-  print($z$). 
-end
-\end{lstlisting}
-
-\begin{algorithm}
-\caption{Calculate $y = x^n$}\label{algo1}
-\begin{algorithmic}[1]
-\Require $n \geq 0 \vee x \neq 0$
-\Ensure $y = x^n$ 
-\State $y \Leftarrow 1$
-\If{$n < 0$}\label{algln2}
-        \State $X \Leftarrow 1 / x$
-        \State $N \Leftarrow -n$
-\Else
-        \State $X \Leftarrow x$
-        \State $N \Leftarrow n$
-\EndIf
-\While{$N \neq 0$}
-        \If{$N$ is even}
-            \State $X \Leftarrow X \times X$
-            \State $N \Leftarrow N / 2$
-        \Else[$N$ is odd]
-            \State $y \Leftarrow y \times X$
-            \State $N \Leftarrow N - 1$
-        \EndIf
-\EndWhile
-\end{algorithmic}
-\end{algorithm}
-
-
-\bigskip
-\begin{minipage}{\hsize}%
-\lstset{frame=single,framexleftmargin=-1pt,framexrightmargin=-17pt,framesep=12pt,linewidth=0.98\textwidth,language=pascal}
-\begin{lstlisting}
-for i:=maxint to 0 do
-begin
-{ do nothing }
-end;
-Write('Case insensitive ');
-Write('Pascal keywords.');
-\end{lstlisting}
-\end{minipage}
-
-\section{Cross referencing}\label{sec8}
-
-Environments such as figure, table, equation and align can have a label
-declared via the \verb+\label{#label}+ command. For figures and table
-environments use the \verb+\label{}+ command inside or just
-below the \verb+\caption{}+ command. You can then use the
-\verb+\ref{#label}+ command to cross-reference them. As an example, consider
-the label declared for Figure~\ref{fig1} which is
-\verb+\label{fig1}+. To cross-reference it, use the command 
-\verb+Figure \ref{fig1}+, for which it comes up as
-``Figure~\ref{fig1}''. 
-
-To reference line numbers in an algorithm, consider the label declared for the line number 2 of Algorithm~\ref{algo1} is \verb+\label{algln2}+. To cross-reference it, use the command \verb+\ref{algln2}+ for which it comes up as line~\ref{algln2} of Algorithm~\ref{algo1}.
-
-\subsection{Details on reference citations}\label{subsec7}
-
-Standard \LaTeX\ permits only numerical citations. To support both numerical and author-year citations this template uses \verb+natbib+ \LaTeX\ package. For style guidance please refer to the template user manual.
-
-Here is an example for \verb+\cite{...}+: \cite{bib1}. Another example for \verb+\citep{...}+: \citep{bib2}. For author-year citation mode, \verb+\cite{...}+ prints Jones et al. (1990) and \verb+\citep{...}+ prints (Jones et al., 1990).
-
-All cited bib entries are printed at the end of this article: \cite{bib3}, \cite{bib4}, \cite{bib5}, \cite{bib6}, \cite{bib7}, \cite{bib8}, \cite{bib9}, \cite{bib10}, \cite{bib11}, \cite{bib12} and \cite{bib13}.
-
-\section{Examples for theorem like environments}\label{sec10}
-
-For theorem like environments, we require \verb+amsthm+ package. There are three types of predefined theorem styles exists---\verb+thmstyleone+, \verb+thmstyletwo+ and \verb+thmstylethree+ 
-
-
-\bigskip
-\begin{tabular}{|l|p{19pc}|}
-\hline
-\verb+thmstyleone+ & Numbered, theorem head in bold font and theorem text in italic style \\\hline
-\verb+thmstyletwo+ & Numbered, theorem head in roman font and theorem text in italic style \\\hline
-\verb+thmstylethree+ & Numbered, theorem head in bold font and theorem text in roman style \\\hline
-\end{tabular}
-\bigskip
-
-
-For mathematics journals, theorem styles can be included as shown in the following examples:
-
-\begin{theorem}[Theorem subhead]\label{thm1}
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. Example theorem text. Example theorem text. Example theorem text. Example theorem text. 
-Example theorem text. 
-\end{theorem}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{proposition}
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-Example proposition text. Example proposition text. Example proposition text. Example proposition text. Example proposition text. 
-\end{proposition}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{example}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{example}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{remark}
-Phasellus adipiscing semper elit. Proin fermentum massa
-ac quam. Sed diam turpis, molestie vitae, placerat a, molestie nec, leo. Maecenas lacinia. Nam ipsum ligula, eleifend
-at, accumsan nec, suscipit a, ipsum. Morbi blandit ligula feugiat magna. Nunc eleifend consequat lorem. 
-\end{remark}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{definition}[Definition sub head]
-Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. Example definition text. 
-\end{definition}
-
-Additionally a predefined ``proof'' environment is available: \verb+\begin{proof}+ \verb+...+ \verb+\end{proof}+. This prints a ``Proof'' head in italic font style and the ``body text'' in roman font style with an open square at the end of each proof environment. 
-
-\begin{proof}
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text. Sample body text.
-
-\begin{proof}[Proof of Theorem~{\upshape\ref{thm1}}]
-Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. Example for proof text. 
-\end{proof}
-
-\noindent
-For a quote environment, use \verb+\begin{quote}...\end{quote}+
-\begin{quote}
-Quoted text example. Aliquam porttitor quam a lacus. Praesent vel arcu ut tortor cursus volutpat. In vitae pede quis diam bibendum placerat. Fusce elementum
-convallis neque. Sed dolor orci, scelerisque ac, dapibus nec, ultricies ut, mi. Duis nec dui quis leo sagittis commodo.
-\end{quote}
-
-Sample body text. Sample body text. Sample body text. Sample body text. Sample body text (refer Figure~\ref{fig1}). Sample body text. Sample body text. Sample body text (refer Table~\ref{tab3}). 
-
-
-\section{Conclusion}\label{sec13}
-
-
-\backmatter
-
-\bmhead{Supplementary information}
-
-If your article has accompanying supplementary file/s please state so here. 
-
-Authors reporting data from electrophoretic gels and blots should supply the full unprocessed scans for key as part of their Supplementary information. This may be requested by the editorial team/s if it is missing.
-
-Please refer to Journal-level guidance for any specific requirements.
-
-\bmhead{Acknowledgements}
-
-Acknowledgements are not compulsory. Where included they should be brief. Grant or contribution numbers may be acknowledged.
-
-Please refer to Journal-level guidance for any specific requirements.
+\section*{Author Contributions}
+Md Arif Faysal Nayem: Conceptualization, Methodology, Software, Validation, Investigation, Data Curation, Writing -- Original Draft, Visualization. Ohidujjaman: Conceptualization, Methodology, Writing -- Review \& Editing, Supervision.
 
 \section*{Declarations}
 
-Some journals require declarations to be submitted in a standardised format. Please check the Instructions for Authors of the journal to which you are submitting to see if you need to complete this section. If yes, your manuscript must contain the following sections under the heading `Declarations':
+\subsection*{Funding}
+Not applicable.
 
-\begin{itemize}
-\item Funding
-\item Conflict of interest/Competing interests (check journal-specific guidelines for which heading to use)
-\item Ethics approval and consent to participate
-\item Consent for publication
-\item Data availability 
-\item Materials availability
-\item Code availability 
-\item Author contribution
-\end{itemize}
+\subsection*{Conflict of interest/Competing interests}
+The authors declare no competing interests.
 
-\noindent
-If any of the sections are not relevant to your manuscript, please include the heading and write `Not applicable' for that section. 
+\subsection*{Data availability}
+The XAI-TRIS dataset is generated using the verbatim Clark et al. implementation~\cite{clark2024}. Sweep results are archived in the repository's results/ directory.
 
+\subsection*{Code availability}
+Implementation code is available in the repository accompanying this manuscript.
 
-\bigskip
-\begin{flushleft}%
-Editorial Policies for:
+\subsection*{Ethics approval and consent to participate}
+Not applicable.
 
-\bigskip\noindent
-Springer journals and proceedings: \url{https://www.springer.com/gp/editorial-policies}
+\subsection*{Consent for publication}
+Not applicable.
 
-\bigskip\noindent
-Nature Portfolio journals: \url{https://www.nature.com/nature-research/editorial-policies}
-
-\bigskip\noindent
-\textit{Scientific Reports}: \url{https://www.nature.com/srep/journal-policies/editorial-policies}
-
-\bigskip\noindent
-BMC journals: \url{https://www.biomedcentral.com/getpublished/editorial-policies}
-\end{flushleft}
+\subsection*{Materials availability}
+Not applicable.
 
 \begin{appendices}
 
-\section{Section title of first appendix}\label{secA1}
+\section{Supplementary material: per-scenario EMD/IME tables}
+Detailed per-method EMD and IME tables for all six scenarios across $\alpha\in\{0.1,\dots,0.9\}$, including standard errors and accuracy-gate outcomes, are provided in the repository's results/ directory.
 
-An appendix contains supplementary information that is not an essential part of the text itself but which may be helpful in providing a more comprehensive understanding of the research problem or it is information that is too cumbersome to be included in the body of the paper.
 \end{appendices}
 
 \bibliography{sn-bibliography}

@@ -84,16 +84,16 @@
     "pushed_at": "2026-10-20T22:08:46.901505"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-1": {
-    "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_1.py",
-    "pushed_at": "2026-10-19T23:09:36.387462"
+    "notebook": "notebooks/xor_white_sweep_1.py",
+    "pushed_at": "2026-10-23T09:29:35.541350"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-2": {
-    "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_2.py",
-    "pushed_at": "2026-10-19T23:10:04.964561"
+    "notebook": "notebooks/xor_white_sweep_2.py",
+    "pushed_at": "2026-10-23T09:29:37.645426"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-3": {
-    "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_3.py",
-    "pushed_at": "2026-10-19T23:10:33.740139"
+    "notebook": "notebooks/xor_white_sweep_3.py",
+    "pushed_at": "2026-10-23T00:51:23.739032"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-4": {
     "notebook": "notebooks/xor_corr_sweep_4.py",
@@ -108,12 +108,12 @@
     "pushed_at": "2026-10-18T13:39:48.031832"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-4": {
-    "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_4.py",
-    "pushed_at": "2026-10-19T23:11:02.663360"
+    "notebook": "notebooks/xor_white_sweep_4.py",
+    "pushed_at": "2026-10-23T01:45:48.658639"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-5": {
-    "notebook": "templates/xor_evaluation/xor_white_sweep/xor_white_sweep_5.py",
-    "pushed_at": "2026-10-19T23:11:31.083241"
+    "notebook": "notebooks/xor_white_sweep_5.py",
+    "pushed_at": "2026-10-23T09:30:46.161180"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-white-qualitative-ridge": {
     "notebook": "templates/xor_evaluation/xor_white_qualitative_ridge/xor_white_qualitative_ridge.py",
@@ -129,15 +129,15 @@
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-4": {
     "notebook": "notebooks/rigid_corr_sweep_4.py",
-    "pushed_at": "2026-10-20T23:59:13.475247"
+    "pushed_at": "2026-10-23T15:37:32.104199"
   },
   "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-5": {
-    "notebook": "templates/lin_evaluation/lin_white_sweep/lin_white_sweep_5.py",
-    "pushed_at": "2026-10-20T10:29:29.592669"
+    "notebook": "notebooks/lin_white_sweep_5.py",
+    "pushed_at": "2026-10-22T17:18:42.922211"
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-6": {
-    "notebook": "templates/rigid_evaluation/rigid_corr_sweep/rigid_corr_sweep_6.py",
-    "pushed_at": "2026-10-20T10:31:05.025493"
+    "notebook": "notebooks/rigid_corr_sweep_6.py",
+    "pushed_at": "2026-10-23T17:21:00.512755"
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-learnability-diag": {
     "notebook": "notebooks/rigid_learnability_diag.py",
@@ -161,7 +161,7 @@
   },
   "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-5": {
     "notebook": "notebooks/rigid_corr_sweep_5.py",
-    "pushed_at": "2026-10-20T23:59:18.389300"
+    "pushed_at": "2026-10-23T15:37:34.278808"
   },
   "mdariffaysalnayem/patternlocal-repro-xor-corr-sweep-6": {
     "notebook": "notebooks/xor_corr_sweep_6.py",
@@ -218,5 +218,85 @@
   "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-7": {
     "notebook": "notebooks/lin_corr_sweep_7.py",
     "pushed_at": "2026-10-22T07:04:35.648587"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-8": {
+    "notebook": "notebooks/lin_corr_sweep_8.py",
+    "pushed_at": "2026-10-22T10:04:47.350707"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-corr-sweep-9": {
+    "notebook": "notebooks/lin_corr_sweep_9.py",
+    "pushed_at": "2026-10-22T12:28:23.654209"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-1": {
+    "notebook": "notebooks/lin_white_sweep_1.py",
+    "pushed_at": "2026-10-22T12:28:26.678459"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-2": {
+    "notebook": "notebooks/lin_white_sweep_2.py",
+    "pushed_at": "2026-10-22T12:32:04.689079"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-3": {
+    "notebook": "notebooks/lin_white_sweep_3.py",
+    "pushed_at": "2026-10-22T14:21:45.724778"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-4": {
+    "notebook": "notebooks/lin_white_sweep_4.py",
+    "pushed_at": "2026-10-22T14:37:52.510343"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-6": {
+    "notebook": "notebooks/lin_white_sweep_6.py",
+    "pushed_at": "2026-10-22T19:13:11.845686"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-7": {
+    "notebook": "notebooks/lin_white_sweep_7.py",
+    "pushed_at": "2026-10-22T19:34:34.426216"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-8": {
+    "notebook": "notebooks/lin_white_sweep_8.py",
+    "pushed_at": "2026-10-22T20:59:32.553141"
+  },
+  "mdariffaysalnayem/patternlocal-repro-lin-white-sweep-9": {
+    "notebook": "notebooks/lin_white_sweep_9.py",
+    "pushed_at": "2026-10-22T21:14:00.288406"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-6": {
+    "notebook": "notebooks/xor_white_sweep_6.py",
+    "pushed_at": "2026-10-23T09:31:22.968355"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-7": {
+    "notebook": "notebooks/xor_white_sweep_7.py",
+    "pushed_at": "2026-10-23T09:31:24.987341"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-8": {
+    "notebook": "notebooks/xor_white_sweep_8.py",
+    "pushed_at": "2026-10-23T15:37:27.791993"
+  },
+  "mdariffaysalnayem/patternlocal-repro-xor-white-sweep-9": {
+    "notebook": "notebooks/xor_white_sweep_9.py",
+    "pushed_at": "2026-10-23T15:37:30.028189"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-7": {
+    "notebook": "notebooks/rigid_corr_sweep_7.py",
+    "pushed_at": "2026-10-23T17:21:03.793278"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-8": {
+    "notebook": "notebooks/rigid_corr_sweep_8.py",
+    "pushed_at": "2026-10-23T17:21:06.784592"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-corr-sweep-9": {
+    "notebook": "notebooks/rigid_corr_sweep_9.py",
+    "pushed_at": "2026-10-23T19:05:40.425729"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-7": {
+    "notebook": "notebooks/rigid_white_sweep_7.py",
+    "pushed_at": "2026-10-23T19:05:44.192316"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-8": {
+    "notebook": "notebooks/rigid_white_sweep_8.py",
+    "pushed_at": "2026-10-23T19:05:47.600362"
+  },
+  "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-9": {
+    "notebook": "notebooks/rigid_white_sweep_9.py",
+    "pushed_at": "2026-10-23T20:16:28.279426"
   }
 }

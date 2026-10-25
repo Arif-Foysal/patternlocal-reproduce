@@ -1,0 +1,132 @@
+{
+  "dataset_overview": {
+    "LIN_CORR": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "LIN_CORR_alpha0.2.npz"
+    },
+    "LIN_WHITE": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "LIN_WHITE_alpha0.2.npz"
+    },
+    "XOR_CORR": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "XOR_CORR_alpha0.2.npz"
+    },
+    "XOR_WHITE": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "XOR_WHITE_alpha0.2.npz"
+    },
+    "RIGID_CORR": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "RIGID_CORR_alpha0.2.npz"
+    },
+    "RIGID_WHITE": {
+      "alpha": 0.2,
+      "idx_y0": 1,
+      "idx_y1": 0,
+      "data_file": "RIGID_WHITE_alpha0.2.npz"
+    }
+  },
+  "qualitative": {
+    "LIN_WHITE_0.2": {
+      "scenario": "LIN_WHITE",
+      "alpha": 0.2,
+      "k_grad": 36000,
+      "k_ig": 36000,
+      "lime_bandwidth": 30.0,
+      "pat_k_ratio": 1.0,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    },
+    "LIN_CORR_0.2": {
+      "scenario": "LIN_CORR",
+      "alpha": 0.2,
+      "k_grad": 5000,
+      "k_ig": 1800,
+      "lime_bandwidth": 20.0,
+      "pat_k_ratio": 0.05,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    },
+    "XOR_WHITE_0.2": {
+      "scenario": "XOR_WHITE",
+      "alpha": 0.2,
+      "k_grad": 36000,
+      "k_ig": 36000,
+      "lime_bandwidth": 20.0,
+      "pat_k_ratio": 1.0,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    },
+    "XOR_CORR_0.2": {
+      "scenario": "XOR_CORR",
+      "alpha": 0.2,
+      "k_grad": 10000,
+      "k_ig": 1800,
+      "lime_bandwidth": 10.0,
+      "pat_k_ratio": 0.05,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    },
+    "RIGID_WHITE_0.7": {
+      "scenario": "RIGID_WHITE",
+      "alpha": 0.7,
+      "k_grad": 1800,
+      "k_ig": 1800,
+      "lime_bandwidth": 30.0,
+      "pat_k_ratio": 0.05,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    },
+    "RIGID_CORR_0.3": {
+      "scenario": "RIGID_CORR",
+      "alpha": 0.3,
+      "k_grad": 1800,
+      "k_ig": 36000,
+      "lime_bandwidth": 30.0,
+      "pat_k_ratio": 0.05,
+      "test_indices": [
+        78,
+        325,
+        184,
+        125,
+        630
+      ]
+    }
+  }
+}

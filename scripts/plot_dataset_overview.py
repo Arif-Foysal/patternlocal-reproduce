@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Dataset overview figure (guide Script 1).
+r"""Dataset overview figure (guide Script 1).
 
 Renders the XAI-TRIS dataset panels: for each scenario (LIN, XOR, RIGID) the
 first y=0 and y=1 test instance at alpha=0.2 with its ground-truth mask.
@@ -70,14 +70,14 @@ def _render(rows, data, noise_type, out_path):
     axes_grid = np.empty((len(rows), 4), dtype=object)
 
     for r_idx, (scen_key, row_label) in enumerate(rows):
+        entry = data[scen_key]
+        if isinstance(entry, np.ndarray) and entry.dtype == object:
+            entry = entry.item()  # savez wrapped the dict in a 0-d array
         for c_idx, col_key in enumerate(cols):
             ax = fig.add_subplot(gs[r_idx, c_idx])
             axes_grid[r_idx, c_idx] = ax
 
-            img = max_abs_scale(data[scen_key][col_key].item()
-                                if isinstance(data[scen_key], np.ndarray)
-                                and data[scen_key].dtype == object
-                                else data[scen_key][col_key])
+            img = max_abs_scale(np.asarray(entry[col_key], dtype=np.float64))
             im_handle = ax.imshow(img, cmap="coolwarm", vmin=-1.0, vmax=1.0,
                                   interpolation="nearest")
 

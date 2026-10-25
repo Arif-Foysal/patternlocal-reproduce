@@ -117,6 +117,9 @@ def main():
     ap.add_argument("--variant", choices=list(VARIANTS) + ["all"], default="all")
     ap.add_argument("--sample", type=int, default=0,
                     help="which of the 5 saved eval samples per row")
+    ap.add_argument("--per-row-sample", default=None,
+                    help="comma list of sample indices, one per row "
+                         "(e.g. '0,0,1,1,0,0' shows y=1 for both XOR rows)")
     ap.add_argument("--use-legacy", action="store_true",
                     help="render from per-sweep sample npz (3 methods only)")
     args = ap.parse_args()
@@ -144,8 +147,15 @@ def main():
         )
 
         attr_im_handle = None
+        per_row = None
+        if args.per_row_sample:
+            per_row = [int(v) for v in args.per_row_sample.split(",")]
+            if len(per_row) != len(ROWS):
+                sys.exit(f"--per-row-sample needs {len(ROWS)} comma-separated values")
         for r_idx, (row_key, row_label) in enumerate(ROWS):
-            row = _load_row(args.bundle, row_key, args.sample, args.use_legacy)
+            row = _load_row(args.bundle, row_key,
+                            per_row[r_idx] if per_row else args.sample,
+                            args.use_legacy)
             # Ground Truth column: signed continuous signal when available,
             # else the binary mask (legacy preview npz lack the signal).
             gt_key = "signal" if "signal" in row else "mask"
@@ -183,7 +193,10 @@ def main():
         cbar.set_label("Feature Importance", fontsize=9, labelpad=6)
         cbar.ax.tick_params(labelsize=8)
 
-        out = os.path.join(args.outdir, f"fig_qualitative_{variant}.pdf")
+        suffix = ""
+        if per_row:
+            suffix = "_mixed" if per_row != [args.sample] * len(ROWS) else ""
+        out = os.path.join(args.outdir, f"fig_qualitative_{variant}{suffix}.pdf")
         plt.savefig(out, format="pdf", bbox_inches="tight", dpi=300)
         plt.close(fig)
         print("wrote", out)

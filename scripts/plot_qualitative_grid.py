@@ -51,6 +51,13 @@ ROWS = [
 ]
 
 VARIANTS = {
+    "final": [
+        ("analytical_ig", "PatternGrad\n(Ours)"),
+        ("patternlocal", "PatternLocal"),
+        ("plain_ig", "Integrated\nGradients"),
+        ("plain_smoothgrad", "SmoothGrad"),
+        ("lime", "LIME"),
+    ],
     "full": [
         ("analytical_ig", "PatternGrad\n(Ours)"),
         ("patternlocal", "PatternLocal"),

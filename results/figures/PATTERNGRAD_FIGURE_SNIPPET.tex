@@ -1,0 +1,39 @@
+% Proposed LaTeX figure environment for the PatternGrad conceptual diagram.
+% Paths assume the PDF is copied next to the manuscript (or use a relative
+% path into the results directory). Notation matches sn-article.tex
+% (Eqs. ig_riemann, pg_kernel, pg_closed).
+
+\begin{figure}[t]
+    \centering
+    \includegraphics[width=\textwidth]{patterngrad_conceptual_diagram.pdf}
+    \caption{The PatternGrad pipeline. Given a differentiable classifier $f$
+    and a target instance $\mathbf{x}_\star$, \textcircled{\small 1}~a
+    deterministic Integrated-Gradients surrogate
+    $\mathbf{w}^{\mathrm{PG}} = \hat{\mathbf{s}}^{\mathrm{IG}}(\mathbf{x}_\star)$
+    is computed by $M$-step quadrature along the straight-line path from the
+    zero baseline $\mathbf{x}' = \mathbf{0}$
+    (Eq.~\eqref{eq:ig_riemann}); no stochastic perturbations or per-instance
+    surrogate fitting are involved, and the only numerical error is the
+    deterministic quadrature error of the $M$-step sum.
+    \textcircled{\small 2}~The $K$ nearest training samples
+    $\mathcal{N}_K(\mathbf{x}_\star)$ are retrieved from
+    $\mathcal{D}_{\mathrm{train}}$ under the Euclidean metric.
+    \textcircled{\small 3}~A training-anchored Gaussian locality kernel
+    assigns normalized weights $\pi_j$ with the instance-adaptive bandwidth
+    $\sigma = \operatorname{median}\{d_j\}$
+    (Eq.~\eqref{eq:pg_kernel}), yielding the weighted, centered neighborhood
+    $\widetilde{\mathbf{X}}_K$.
+    \textcircled{\small 4}~The surrogate response
+    $\tilde{y} = (\mathbf{w}^{\mathrm{PG}})^\top
+    \mathbf{h}_{\mathbf{x}_\star}(\mathbf{x})$ is converted into the
+    generative attribution pattern $\mathbf{a}$ through the kernel-weighted
+    ridge closed form $\mathbf{a} = \mathbf{C}_K \mathbf{w}^{\mathrm{PG}} /
+    ((\mathbf{w}^{\mathrm{PG}})^\top \mathbf{C}_K \mathbf{w}^{\mathrm{PG}} + \lambda)$
+    (Eq.~\eqref{eq:pg_closed}), evaluated with the $\mathcal{O}(KD)$ two-pass
+    product without materializing $\mathbf{C}_K$.
+    Right: the ground-truth signal, the raw IG map, and the PatternGrad
+    output for one LIN-WHITE test instance ($\alpha = 0.2$), illustrating
+    reduced attribution leakage into irrelevant background regions at
+    preserved spatial resolution.}
+    \label{fig:patterngrad_concept}
+\end{figure}

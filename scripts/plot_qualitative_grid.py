@@ -146,7 +146,10 @@ def main():
         attr_im_handle = None
         for r_idx, (row_key, row_label) in enumerate(ROWS):
             row = _load_row(args.bundle, row_key, args.sample, args.use_legacy)
-            cols = [("X", "data"), ("mask", "data")] + \
+            # Ground Truth column: signed continuous signal when available,
+            # else the binary mask (legacy preview npz lack the signal).
+            gt_key = "signal" if "signal" in row else "mask"
+            cols = [("X", "data"), (gt_key, "data")] + \
                    [(mk, "attr") for mk, _ in method_cols]
             for c_idx, (arr_key, kind) in enumerate(cols):
                 ax = fig.add_subplot(gs[r_idx, c_idx])

@@ -54,8 +54,11 @@ def _load(bundle):
 
 
 def _render(rows, data, noise_type, out_path):
-    """rows: list of (scenario_key, row_label). One shared colorbar."""
-    cols = ["y0_mask", "y0_x", "y1_mask", "y1_x"]
+    """rows: list of (scenario_key, row_label). One shared colorbar.
+    Ground truth is rendered from the SIGNED continuous signal
+    (y0_signal / y1_signal: Clark's blurred pattern before binarization),
+    not the binary support mask used for EMD/IME metrics."""
+    cols = ["y0_signal", "y0_x", "y1_signal", "y1_x"]
     col_headers = ["MASK", "INST.", "MASK", "INST."]
 
     fig = plt.figure(figsize=(4.8, 1.05 * len(rows) + 0.35))

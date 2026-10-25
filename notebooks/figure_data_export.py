@@ -101,6 +101,11 @@ def main():
 
     # ------------------------------------------------------------------
     # 1) Dataset overview: first y=0 and y=1 test sample at alpha=0.2.
+    #    Render ground truth from the SIGNED continuous signal
+    #    (masks_test_raw: Clark's blurred pattern before binarization),
+    #    not the binary support mask. XOR samples are polarity-filtered
+    #    (y=0: +T,+L; y=1: -T,+L); RIGID samples are filtered so the
+    #    moving blob stays clear of the frame border.
     # ------------------------------------------------------------------
     ov = {}
     for scen in SCENARIOS:
@@ -110,20 +115,60 @@ def main():
             print(f"ERROR: {pattern} not found; skipping {scen}")
             continue
         data = np.load(path)
-        X_test, y_test, masks = data["X_test"], data["y_test"], data["masks_test"]
-        i0 = int(np.argmax(y_test == 0))
-        i1 = int(np.argmax(y_test == 1))
+        X_test, y_test = data["X_test"], data["y_test"]
+        masks = data["masks_test"]
+        raw = data["masks_test_raw"].astype(np.float32)
+
+        def pick(pred):
+            hits = [i for i in range(len(y_test)) if pred(i)]
+            return hits[0] if hits else None
+
+        if scen.startswith("LIN"):
+            i0 = pick(lambda i: y_test[i] == 0)
+            i1 = pick(lambda i: y_test[i] == 1)
+            sel = "first-y"
+        elif scen.startswith("XOR"):
+            def signs(i):
+                sig = raw[i].reshape(IMAGE_SHAPE)
+                t, l = sig[:32, :32], sig[32:, 32:]
+                out = []
+                for q in (t, l):
+                    m = np.max(np.abs(q))
+                    out.append(np.sign(q[np.abs(q) > 0.01 * m].mean())
+                               if m > 0 else 0.0)
+                return out
+            i0 = pick(lambda i: y_test[i] == 0 and signs(i) == [1.0, 1.0])
+            i1 = pick(lambda i: y_test[i] == 1 and signs(i) == [-1.0, 1.0])
+            sel = "polarity"
+        else:  # RIGID: moving blob must not touch the frame border
+            def unclipped(i, margin=2):
+                sig = np.abs(raw[i].reshape(IMAGE_SHAPE))
+                if sig.max() <= 0:
+                    return False
+                core = sig > 0.01 * sig.max()
+                rr, cc = np.where(core)
+                return (rr.min() >= margin and rr.max() <= IMAGE_SHAPE[0] - 1 - margin
+                        and cc.min() >= margin and cc.max() <= IMAGE_SHAPE[1] - 1 - margin)
+            i0 = pick(lambda i: y_test[i] == 0 and unclipped(i))
+            i1 = pick(lambda i: y_test[i] == 1 and unclipped(i))
+            sel = "border-margin"
+        if i0 is None or i1 is None:  # fall back to first-y selection
+            i0 = pick(lambda i: y_test[i] == 0)
+            i1 = pick(lambda i: y_test[i] == 1)
+            sel += "+fallback"
         ov[scen] = {
             "y0_x": X_test[i0].reshape(IMAGE_SHAPE),
             "y0_mask": masks[i0].reshape(IMAGE_SHAPE),
+            "y0_signal": raw[i0].reshape(IMAGE_SHAPE),
             "y1_x": X_test[i1].reshape(IMAGE_SHAPE),
             "y1_mask": masks[i1].reshape(IMAGE_SHAPE),
+            "y1_signal": raw[i1].reshape(IMAGE_SHAPE),
         }
         manifest["dataset_overview"][scen] = {
-            "alpha": OVERVIEW_ALPHA, "idx_y0": i0, "idx_y1": i1,
-            "data_file": os.path.basename(path),
+            "alpha": OVERVIEW_ALPHA, "idx_y0": int(i0), "idx_y1": int(i1),
+            "selection": sel, "data_file": os.path.basename(path),
         }
-        print(f"  overview {scen}: y0 idx {i0}, y1 idx {i1}", flush=True)
+        print(f"  overview {scen} ({sel}): y0 idx {i0}, y1 idx {i1}", flush=True)
 
     np.savez(os.path.join(OUT_DIR, "dataset_overview.npz"), **ov)
 
@@ -149,7 +194,7 @@ def main():
         eval_idx = split_eval_idx(X_test)
         ev = ec.XORCorrEvaluator(model, X_train, device=ec.DEVICE)
 
-        arrays = {"X": [], "mask": [], "y": []}
+        arrays = {"X": [], "mask": [], "signal": [], "y": []}
         for m in METHODS:
             arrays[m] = []
         tags = []
@@ -166,6 +211,8 @@ def main():
                                       k_grad, k_ig, v, b, X_train, pat)
             arrays["X"].append(x.reshape(IMAGE_SHAPE))
             arrays["mask"].append(mask.reshape(IMAGE_SHAPE))
+            arrays["signal"].append(
+                data["masks_test_raw"][i].astype(np.float32).reshape(IMAGE_SHAPE))
             arrays["y"].append(int(y_test[i]))
             for m in METHODS:
                 arrays[m].append(np.asarray(attrs[m], dtype=np.float64).reshape(IMAGE_SHAPE))
@@ -176,6 +223,7 @@ def main():
                  tags=np.array(tags),
                  X=np.stack(arrays["X"]),
                  mask=np.stack(arrays["mask"]),
+                 signal=np.stack(arrays["signal"]),
                  y=np.array(arrays["y"]),
                  **{m: np.stack(arrays[m]) for m in METHODS})
         manifest["qualitative"][row_key] = {

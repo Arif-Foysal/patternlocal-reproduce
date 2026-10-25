@@ -708,6 +708,21 @@ pipeline:
         - all 1 alpha complete for 13 methods
         kernel_sources:
         - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-white
+    phase4_figures:
+      description: Figure data export (dataset overview + qualitative bundle)
+      notebooks:
+      - id: figure_data_export
+        gpu: false
+        datasets: []
+        success_criteria:
+        - dataset_overview.npz for 6 scenarios + 6 qual npz bundles
+        kernel_sources:
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-lin-white
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-xor-white
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-corr
+        - mdariffaysalnayem/patternlocal-repro-phase2-clark-rigid-white
     phase3_xor_corr_ab_1:
       description: 'XOR CORR SNR sweep part 1 (additional baselines): alpha = 0.1, 0.2, 0.3'
       notebooks:

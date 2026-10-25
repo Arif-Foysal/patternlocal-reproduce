@@ -298,5 +298,9 @@
   "mdariffaysalnayem/patternlocal-repro-rigid-white-sweep-9": {
     "notebook": "notebooks/rigid_white_sweep_9.py",
     "pushed_at": "2026-10-23T20:16:28.279426"
+  },
+  "mdariffaysalnayem/patternlocal-repro-figure-data-export": {
+    "notebook": "notebooks/figure_data_export.py",
+    "pushed_at": "2026-10-25T18:27:56.952774"
   }
 }

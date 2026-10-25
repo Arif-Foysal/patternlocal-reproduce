@@ -4,36 +4,42 @@
       "alpha": 0.2,
       "idx_y0": 1,
       "idx_y1": 0,
+      "selection": "first-y",
       "data_file": "LIN_CORR_alpha0.2.npz"
     },
     "LIN_WHITE": {
       "alpha": 0.2,
       "idx_y0": 1,
       "idx_y1": 0,
+      "selection": "first-y",
       "data_file": "LIN_WHITE_alpha0.2.npz"
     },
     "XOR_CORR": {
       "alpha": 0.2,
-      "idx_y0": 1,
-      "idx_y1": 0,
+      "idx_y0": 11,
+      "idx_y1": 3,
+      "selection": "polarity",
       "data_file": "XOR_CORR_alpha0.2.npz"
     },
     "XOR_WHITE": {
       "alpha": 0.2,
-      "idx_y0": 1,
-      "idx_y1": 0,
+      "idx_y0": 11,
+      "idx_y1": 3,
+      "selection": "polarity",
       "data_file": "XOR_WHITE_alpha0.2.npz"
     },
     "RIGID_CORR": {
       "alpha": 0.2,
       "idx_y0": 1,
       "idx_y1": 0,
+      "selection": "border-margin",
       "data_file": "RIGID_CORR_alpha0.2.npz"
     },
     "RIGID_WHITE": {
       "alpha": 0.2,
       "idx_y0": 1,
       "idx_y1": 0,
+      "selection": "border-margin",
       "data_file": "RIGID_WHITE_alpha0.2.npz"
     }
   },

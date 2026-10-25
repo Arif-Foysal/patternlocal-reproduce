@@ -1,63 +1,63 @@
-[{"stream_name":"stdout","time":10.448207313,"data":"  overview LIN_CORR: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":11.277717296,"data":"  overview LIN_WHITE: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":12.336008302,"data":"  overview XOR_CORR: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":13.445967667,"data":"  overview XOR_WHITE: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":14.569959728,"data":"  overview RIGID_CORR: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":15.342578737,"data":"  overview RIGID_WHITE: y0 idx 1, y1 idx 0\n"}
-,{"stream_name":"stdout","time":15.344473062,"data":"\n"}
-,{"stream_name":"stdout","time":15.344518339,"data":"=== LIN_WHITE_0.2 ===\n"}
-,{"stream_name":"stdout","time":28.083900977,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":30.25887761,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":32.490271535,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":34.710960871,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":36.897122343,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":36.901472768,"data":"  saved qual_LIN_WHITE_0.2.npz\n"}
-,{"stream_name":"stdout","time":36.901523216,"data":"\n"}
-,{"stream_name":"stdout","time":36.901528396,"data":"=== LIN_CORR_0.2 ===\n"}
-,{"stream_name":"stdout","time":48.786350172,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":50.884401987,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":53.038426411,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":55.199215967,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":57.350670956,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":57.355022686,"data":"  saved qual_LIN_CORR_0.2.npz\n"}
-,{"stream_name":"stdout","time":57.355048924,"data":"\n"}
-,{"stream_name":"stdout","time":57.355055208,"data":"=== XOR_WHITE_0.2 ===\n"}
-,{"stream_name":"stdout","time":69.222659044,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":71.285694654,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":73.411675076,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":75.486524612,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":77.602247348,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":77.606542684,"data":"  saved qual_XOR_WHITE_0.2.npz\n"}
-,{"stream_name":"stdout","time":77.606569334,"data":"\n"}
-,{"stream_name":"stdout","time":77.60657569,"data":"=== XOR_CORR_0.2 ===\n"}
-,{"stream_name":"stdout","time":88.899371393,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":91.044508346,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":93.220287309,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":95.367860721,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":97.547176023,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":97.551813883,"data":"  saved qual_XOR_CORR_0.2.npz\n"}
-,{"stream_name":"stdout","time":97.551846139,"data":"\n"}
-,{"stream_name":"stdout","time":97.551851608,"data":"=== RIGID_WHITE_0.7 ===\n"}
-,{"stream_name":"stdout","time":110.105044734,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":112.120087354,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":114.067295802,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":115.968801735,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":117.970572175,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":117.975428071,"data":"  saved qual_RIGID_WHITE_0.7.npz\n"}
-,{"stream_name":"stdout","time":117.975460546,"data":"\n"}
-,{"stream_name":"stdout","time":117.975465343,"data":"=== RIGID_CORR_0.3 ===\n"}
-,{"stream_name":"stdout","time":130.757788328,"data":"  sample 0 (test idx 78, y=0) done\n"}
-,{"stream_name":"stdout","time":133.03229643,"data":"  sample 1 (test idx 325, y=1) done\n"}
-,{"stream_name":"stdout","time":135.197634154,"data":"  sample 2 (test idx 184, y=1) done\n"}
-,{"stream_name":"stdout","time":137.446043261,"data":"  sample 3 (test idx 125, y=0) done\n"}
-,{"stream_name":"stdout","time":139.609195116,"data":"  sample 4 (test idx 630, y=1) done\n"}
-,{"stream_name":"stdout","time":139.614186169,"data":"  saved qual_RIGID_CORR_0.3.npz\n"}
-,{"stream_name":"stdout","time":139.614559247,"data":"\n"}
-,{"stream_name":"stdout","time":139.614574582,"data":"Figure bundle complete: ['qual_XOR_CORR_0.2.npz', 'qual_XOR_WHITE_0.2.npz', 'qual_RIGID_WHITE_0.7.npz', 'qual_LIN_WHITE_0.2.npz', 'qual_LIN_CORR_0.2.npz', 'qual_RIGID_CORR_0.3.npz', 'manifest.json', 'dataset_overview.npz']\n"}
-,{"stream_name":"stderr","time":143.71043109,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
-,{"stream_name":"stderr","time":143.710569172,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
-,{"stream_name":"stderr","time":144.180671062,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
-,{"stream_name":"stderr","time":144.180706861,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
-,{"stream_name":"stderr","time":145.288158172,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
-,{"stream_name":"stderr","time":146.771120388,"data":"[NbConvertApp] Writing 313416 bytes to __results__.html\n"}
+[{"stream_name":"stdout","time":12.171910962,"data":"  overview LIN_CORR (first-y): y0 idx 1, y1 idx 0\n"}
+,{"stream_name":"stdout","time":12.933796815000001,"data":"  overview LIN_WHITE (first-y): y0 idx 1, y1 idx 0\n"}
+,{"stream_name":"stdout","time":13.936418543,"data":"  overview XOR_CORR (polarity): y0 idx 11, y1 idx 3\n"}
+,{"stream_name":"stdout","time":14.77438554,"data":"  overview XOR_WHITE (polarity): y0 idx 11, y1 idx 3\n"}
+,{"stream_name":"stdout","time":15.676710041,"data":"  overview RIGID_CORR (border-margin): y0 idx 1, y1 idx 0\n"}
+,{"stream_name":"stdout","time":16.507272275,"data":"  overview RIGID_WHITE (border-margin): y0 idx 1, y1 idx 0\n"}
+,{"stream_name":"stdout","time":16.509675656,"data":"\n"}
+,{"stream_name":"stdout","time":16.509719254,"data":"=== LIN_WHITE_0.2 ===\n"}
+,{"stream_name":"stdout","time":25.936383449,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":28.043943742,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":30.156334047,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":32.336700262,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":34.468467093,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":34.472805507,"data":"  saved qual_LIN_WHITE_0.2.npz\n"}
+,{"stream_name":"stdout","time":34.472835491,"data":"\n"}
+,{"stream_name":"stdout","time":34.472840595,"data":"=== LIN_CORR_0.2 ===\n"}
+,{"stream_name":"stdout","time":46.102039374,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":48.152251575,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":50.187125641,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":52.2070222,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":54.183236986,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":54.187484263,"data":"  saved qual_LIN_CORR_0.2.npz\n"}
+,{"stream_name":"stdout","time":54.187522782,"data":"\n"}
+,{"stream_name":"stdout","time":54.187529637,"data":"=== XOR_WHITE_0.2 ===\n"}
+,{"stream_name":"stdout","time":63.257627157,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":65.564113303,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":67.548322479,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":69.578337914,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":71.571168297,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":71.57535806,"data":"  saved qual_XOR_WHITE_0.2.npz\n"}
+,{"stream_name":"stdout","time":71.575398068,"data":"\n"}
+,{"stream_name":"stdout","time":71.575405168,"data":"=== XOR_CORR_0.2 ===\n"}
+,{"stream_name":"stdout","time":80.969680328,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":82.862370381,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":84.759006178,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":86.657206809,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":88.549398781,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":88.553579576,"data":"  saved qual_XOR_CORR_0.2.npz\n"}
+,{"stream_name":"stdout","time":88.553616622,"data":"\n"}
+,{"stream_name":"stdout","time":88.553622949,"data":"=== RIGID_WHITE_0.7 ===\n"}
+,{"stream_name":"stdout","time":97.612235082,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":99.452876963,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":101.483345882,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":103.913626385,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":106.117037983,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":106.123251308,"data":"  saved qual_RIGID_WHITE_0.7.npz\n"}
+,{"stream_name":"stdout","time":106.123298641,"data":"\n"}
+,{"stream_name":"stdout","time":106.123303934,"data":"=== RIGID_CORR_0.3 ===\n"}
+,{"stream_name":"stdout","time":116.770243396,"data":"  sample 0 (test idx 78, y=0) done\n"}
+,{"stream_name":"stdout","time":119.243043049,"data":"  sample 1 (test idx 325, y=1) done\n"}
+,{"stream_name":"stdout","time":121.753182857,"data":"  sample 2 (test idx 184, y=1) done\n"}
+,{"stream_name":"stdout","time":124.432980179,"data":"  sample 3 (test idx 125, y=0) done\n"}
+,{"stream_name":"stdout","time":127.067606429,"data":"  sample 4 (test idx 630, y=1) done\n"}
+,{"stream_name":"stdout","time":127.073597531,"data":"  saved qual_RIGID_CORR_0.3.npz\n"}
+,{"stream_name":"stdout","time":127.074306084,"data":"\n"}
+,{"stream_name":"stdout","time":127.074352369,"data":"Figure bundle complete: ['qual_RIGID_CORR_0.3.npz', 'dataset_overview.npz', 'qual_LIN_WHITE_0.2.npz', 'qual_XOR_CORR_0.2.npz', 'manifest.json', 'qual_XOR_WHITE_0.2.npz', 'qual_LIN_CORR_0.2.npz', 'qual_RIGID_WHITE_0.7.npz']\n"}
+,{"stream_name":"stderr","time":131.467434646,"data":"/usr/local/lib/python3.13/dist-packages/mistune.py:435: SyntaxWarning: invalid escape sequence '\\|'\n"}
+,{"stream_name":"stderr","time":131.467498327,"data":"  cells[i][c] = re.sub('\\\\\\\\\\|', '|', cell)\n"}
+,{"stream_name":"stderr","time":131.985974378,"data":"/usr/local/lib/python3.13/dist-packages/nbconvert/filters/filter_links.py:36: SyntaxWarning: invalid escape sequence '\\_'\n"}
+,{"stream_name":"stderr","time":131.986034204,"data":"  text = re.sub(r'_', '\\_', text) # Escape underscores in display text\n"}
+,{"stream_name":"stderr","time":133.143568789,"data":"[NbConvertApp] Converting notebook __script__.ipynb to html\n"}
+,{"stream_name":"stderr","time":134.832935546,"data":"[NbConvertApp] Writing 326664 bytes to __results__.html\n"}
 ]

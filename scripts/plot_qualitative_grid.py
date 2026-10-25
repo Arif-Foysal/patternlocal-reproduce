@@ -192,7 +192,7 @@ def main():
                                  pad=5)
                 if c_idx == 0:
                     ax.set_ylabel(row_label, fontsize=8, rotation=90,
-                                  labelpad=6, va="center", ha="center")
+                                  labelpad=10, va="center", ha="center")
 
         cbar_ax = fig.add_subplot(gs[:, -1])
         cbar = fig.colorbar(attr_im_handle, cax=cbar_ax,

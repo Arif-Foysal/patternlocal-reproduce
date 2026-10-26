@@ -44,7 +44,7 @@ METHOD_STYLES = [
     ("plain_grad",       "Saliency",            "#40916c", ">", 1.1, 5),
     ("plain_smoothgrad", "SmoothGrad",          "#52b788", "<", 1.1, 5),
     ("guided_backprop",  "GuidedBackprop",      "#74c69d", "2", 1.1, 4),
-    ("gradient_shap",    "GradientShap",        "#95d5b2", "1", 1.1, 4),
+    ("gradient_shap",    "GradientSHAP",        "#95d5b2", "1", 1.1, 4),
 ]
 
 SCENARIO_GRID = [
@@ -176,7 +176,7 @@ def plot_metric_grid(results_dir, metric_name="emd", band_scale=0.5,
                 ax.set_ylabel(row_title, fontfamily="monospace",
                               fontsize=12, labelpad=8)
             if r_idx == 1:
-                ax.set_xlabel(r"$\alpha$ (SNR)", fontsize=9.5, labelpad=4)
+                ax.set_xlabel("\u03b1 (SNR)", fontsize=9.5, labelpad=4)
 
     # Shared bottom legend
     handles = [legend_handles[label]
